@@ -1,58 +1,65 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LabSpace
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Sistem Monitoring Ketersediaan dan Reservasi Laboratorium Komputer Berbasis Web (Laravel)**  
+Final Project — Pemrograman Web Berbasis Framework (Kelas D)
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tentang Aplikasi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**LabSpace** memusatkan informasi jadwal ketersediaan ruang laboratorium komputer Teknik Informatika agar mahasiswa dapat mengecek kekosongan ruangan secara *real-time* sebelum datang ke lokasi, sekaligus mengajukan permohonan izin pemakaian ruang di luar jam praktikum reguler.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Bagi pihak pengelola (laboran), LabSpace menyediakan dashboard untuk mengatur master ruang lab, jadwal praktikum semesteran, memvalidasi permohonan reservasi mahasiswa (approve/reject), serta menerbitkan surat izin pemakaian lab dalam format PDF.
 
-## Learning Laravel
+> Dokumen perencanaan lengkap juga tersedia di [`PERENCANAAN_FP.md`](./PERENCANAAN_FP.md).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Anggota Kelompok & Pembagian Tugas
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| No | Nama | NIM | Branch | Fokus & Modul CRUD |
+|---|---|---|---|---|
+| 1 | Farrel Athallah | L200250030 | `farrel/auth-labs` | Autentikasi multi-role, middleware akses, ERD/migrasi, **CRUD Ruang Lab (`labs`)** |
+| 2 | Andrawina Farrel Ariyono | L200250012 | `andra/reservasi` | Form reservasi, validasi overlap jadwal (anti-bentrok), **CRUD Reservasi (`reservasis`)** |
+| 3 | Dimas Satrio Wardhono | L200250052 | `dimas/jadwal-laboran` | Dashboard approval laboran, kalender ketersediaan, export PDF (`dompdf`), **CRUD Jadwal Praktikum (`jadwal_rutin`)** |
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Fitur Utama
+
+- **Monitoring Ketersediaan Lab** — Timeline per ruang lab yang membedakan slot praktikum reguler, reservasi terpakai, dan slot tersedia.
+- **Reservasi Workspace Online** — Pengajuan pemakaian ruang di luar jam kuliah beserta tujuan dan daftar anggota kelompok.
+- **Validasi Anti-Bentrok** — Pengecekan otomatis overlap waktu terhadap jadwal praktikum rutin dan reservasi lain pada lab yang sama.
+- **Manajemen Lab & Jadwal Rutin** — Pengelolaan data ruangan (`labs`) dan jadwal praktikum semesteran (`jadwal_rutin`) oleh laboran.
+- **Verifikasi & Surat Izin PDF** — Persetujuan/penolakan oleh laboran disertai penerbitan e-tiket dan cetak bukti izin PDF.
+
+---
+
+## Stack Teknologi
+
+- **Backend:** Laravel 13.44.1 (PHP ^8.3)
+- **Frontend:** Blade + Tailwind CSS
+- **Database:** MySQL / SQLite (dev)
+- **PDF Export:** `barryvdh/laravel-dompdf`
+
+---
+
+## Setup Lokal (Untuk Anggota Tim)
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/parrel17/labspace-ums.git
+cd labspace-ums
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Masuk ke branch tugas masing-masing sebelum mulai mengoding:
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+git checkout farrel/auth-labs        # Farrel
+git checkout andra/reservasi         # Andra
+git checkout dimas/jadwal-laboran    # Dimas
+```

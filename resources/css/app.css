@@ -1,9 +1,71 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+:root {
+  --bg: #ece8df;
+  --surface: #f7f4ed;
+  --surface-subtle: #e3ded3;
+  --surface-elevated: #fbf9f4;
+  --border: #d4cdc0;
+  --border-strong: #bfb6a6;
+  --ink: #1c1917;
+  --ink-muted: #57534e;
+  --accent: #1c1917;
+  --accent-hover: #292524;
+  --accent-ink: #faf8f5;
+  --open-bg: #eaf5ec;
+  --open-border: #8ec99a;
+  --open-ink: #14532d;
+  --open-bar: #16a34a;
+  --busy-bg: #fbecec;
+  --busy-border: #efb6b6;
+  --busy-ink: #991b1b;
+  --busy-bar: #dc2626;
+  --reserved-bg: #eaf1fb;
+  --reserved-border: #adc8f5;
+  --reserved-ink: #1d4ed8;
+  --reserved-bar: #2563eb;
+  --pending-bg: #fbf2dd;
+  --pending-border: #e6c67e;
+  --pending-ink: #854d0e;
+  --pending-bar: #d97706;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+html[data-theme="dark"] {
+  --bg: #0c0c0e;
+  --surface: #141417;
+  --surface-subtle: #1c1c21;
+  --surface-elevated: #1a1a1f;
+  --border: #2a2a31;
+  --border-strong: #3d3d47;
+  --ink: #faf8f5;
+  --ink-muted: #a8a29e;
+  --accent: #faf8f5;
+  --accent-hover: #e7e5e4;
+  --accent-ink: #141417;
+  --open-bg: #0d2317;
+  --open-border: #1e5b3d;
+  --open-ink: #4ade80;
+  --open-bar: #22c55e;
+  --busy-bg: #271316;
+  --busy-border: #69262d;
+  --busy-ink: #fca5a5;
+  --busy-bar: #ef4444;
+  --reserved-bg: #111c33;
+  --reserved-border: #1e3a8a;
+  --reserved-ink: #93c5fd;
+  --reserved-bar: #3b82f6;
+  --pending-bg: #271b0d;
+  --pending-border: #6b4714;
+  --pending-ink: #fcd34d;
+  --pending-bar: #f59e0b;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
 }

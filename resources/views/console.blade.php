@@ -2,13 +2,13 @@
 
 @php($isId = app()->getLocale() === 'id')
 
-@section('title', $isId ? 'LabSpace TI UMS - Console Laboran' : 'LabSpace TI UMS - Lab Technician Console')
+@section('title', $isId ? 'LabSpace TI UMS - Pusat Kontrol Admin & Laboran' : 'LabSpace TI UMS - Admin Control Center')
 
 @section('content')
   <div class="pb-4 mb-5 border-b border-[var(--border)] flex flex-wrap items-end justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-extrabold tracking-tight">{{ $isId ? 'Console Pengelola Lab (Laboran)' : 'Lab Technician Console' }}</h1>
-      <p class="text-sm text-[var(--ink-muted)] mt-1">{{ $isId ? 'Ringkasan operasional ruang lab dan permohonan mahasiswa terbaru.' : 'Operational overview of laboratory rooms and recent student requests.' }}</p>
+      <h1 class="text-2xl font-extrabold tracking-tight">{{ $isId ? 'Pusat Kontrol Admin & Laboran' : 'Admin Control Center' }}</h1>
+      <p class="text-sm text-[var(--ink-muted)] mt-1">{{ $isId ? 'Kelola verifikasi reservasi, master ruang lab, jadwal praktikum, dan akun pengguna.' : 'Manage reservation verification, lab rooms, practicum schedules, and user accounts.' }}</p>
     </div>
     <span class="font-mono text-xs font-semibold px-3 py-1.5 rounded-full border border-[var(--border)] bg-[var(--surface-subtle)]">
       Role: {{ auth()->user()->role }}
@@ -57,7 +57,16 @@
               <td class="px-4 py-3">{{ $b->user?->name }} <span class="text-xs font-mono text-[var(--ink-muted)]">({{ $b->user?->nim }})</span></td>
               <td class="px-4 py-3 font-mono text-xs">{{ $b->lab?->kode_lab }}</td>
               <td class="px-4 py-3 font-mono text-xs">{{ $b->tanggal->format('Y-m-d') }} &middot; {{ $b->jam_mulai }}-{{ $b->jam_selesai }}</td>
-              <td class="px-4 py-3 text-xs font-semibold uppercase">{{ $b->status }}</td>
+              <td class="px-4 py-3">
+                @php($badgeClass = match($b->status) {
+                  'approved' => 'bg-[var(--open-bg)] text-[var(--open-ink)] border-[var(--open-border)]',
+                  'rejected', 'cancelled' => 'bg-[var(--busy-bg)] text-[var(--busy-ink)] border-[var(--busy-border)]',
+                  default => 'bg-[var(--pending-bg)] text-[var(--pending-ink)] border-[var(--pending-border)]',
+                })
+                <span class="inline-flex px-2.5 py-0.5 rounded-full border text-[11px] font-mono font-bold uppercase {{ $badgeClass }}">
+                  {{ $b->status }}
+                </span>
+              </td>
             </tr>
           @endforeach
         </tbody>

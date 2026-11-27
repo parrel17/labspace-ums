@@ -121,4 +121,19 @@ class LabSpaceFoundationTest extends TestCase
         $response->assertSessionHasErrors('nim');
         $this->assertGuest();
     }
+
+    public function test_guest_sees_navbar_while_authenticated_user_sees_collapsible_sidebar(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $guestHome = $this->get('/');
+        $guestHome->assertOk();
+        $guestHome->assertDontSee('id="cf-sidebar"', false);
+
+        $laboran = User::where('role', 'laboran')->firstOrFail();
+        $consoleRes = $this->actingAs($laboran)->get('/console');
+        $consoleRes->assertOk();
+        $consoleRes->assertSee('id="cf-sidebar"', false);
+        $consoleRes->assertSee('sidebar-quick-search', false);
+    }
 }

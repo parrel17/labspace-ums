@@ -105,4 +105,20 @@ class LabSpaceFoundationTest extends TestCase
         $student = User::where('nim', 'L200240081')->firstOrFail();
         $this->assertGreaterThan(0, $student->reservasis()->count());
     }
+
+    public function test_duplicate_nim_case_insensitive_is_rejected_cleanly(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $response = $this->post('/register', [
+            'name' => 'Duplicate Student',
+            'nim' => 'l200240081',
+            'email' => 'dup@student.ums.ac.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors('nim');
+        $this->assertGuest();
+    }
 }

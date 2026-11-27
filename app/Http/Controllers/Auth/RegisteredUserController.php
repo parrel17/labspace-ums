@@ -22,6 +22,12 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $request->merge([
+            'name' => trim((string) $request->input('name')),
+            'nim' => Str::upper(trim((string) $request->input('nim'))),
+            'email' => Str::lower(trim((string) $request->input('email'))),
+        ]);
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'nim' => ['required', 'string', 'max:30', 'unique:'.User::class],
@@ -30,9 +36,9 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'name' => trim($request->name),
-            'nim' => Str::upper(trim($request->nim)),
-            'email' => Str::lower(trim($request->email)),
+            'name' => $request->name,
+            'nim' => $request->nim,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'mahasiswa',
         ]);

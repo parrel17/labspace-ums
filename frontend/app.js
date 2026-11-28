@@ -1741,11 +1741,9 @@
     const pendingCount = state.reservasis.filter((r) => r.status === 'pending').length;
 
     document.body.classList.toggle('is-authenticated', isLogged);
-    const hamBtn = document.getElementById('btn-hamburger-menu');
     const routePill = document.getElementById('header-route-pill');
     const drawerNavWrap = document.getElementById('drawer-nav-wrap');
     const cfSidebar = document.getElementById('cf-sidebar');
-    if (hamBtn) hamBtn.hidden = !isLogged;
     if (routePill) routePill.hidden = !isLogged;
     if (drawerNavWrap) drawerNavWrap.hidden = !isLogged;
     if (cfSidebar) cfSidebar.hidden = !isLogged;
@@ -4435,17 +4433,6 @@
     });
 
     document.getElementById('btn-open-drawer').addEventListener('click', (e) => openDrawer(e.currentTarget));
-    const hamMenuBtn = document.getElementById('btn-hamburger-menu');
-    if (hamMenuBtn) {
-      hamMenuBtn.addEventListener('click', (e) => {
-        if (window.innerWidth > 960 && currentUser()) {
-          document.body.classList.toggle('sidebar-collapsed');
-          return;
-        }
-        hamMenuBtn.setAttribute('aria-expanded', 'true');
-        openDrawer(e.currentTarget);
-      });
-    }
     const collapseSidebarBtn = document.getElementById('btn-collapse-sidebar');
     if (collapseSidebarBtn) {
       collapseSidebarBtn.addEventListener('click', () => {

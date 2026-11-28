@@ -4067,7 +4067,14 @@ html[data-theme="dark"] .select {
   }
   .mobile-menu-btn {
     display: inline-flex;
-    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    min-height: 42px;
+    padding: 0 11px;
+  }
+  .mobile-menu-label {
+    display: none;
   }
   .hamburger-btn {
     min-height: 44px;

@@ -1,0 +1,10 @@
+{
+  "name": "labspace-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LabSpace TI UMS Frontend Preview (Zero-Dependency Local SPA Server)",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
+  }
+}

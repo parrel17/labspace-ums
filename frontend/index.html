@@ -4,17 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LabSpace TI UMS - Lab Availability &amp; Reservation System</title>
-  <link rel="icon" type="image/png" href="/labspace/assets/logo-ls.png?v=56">
+  <script>
+    (function () {
+      var p = window.location.pathname;
+      if (p === '/labspace' || p === '/frontend') {
+        window.location.replace(p + '/' + window.location.search + window.location.hash);
+      }
+    })();
+  </script>
+  <link rel="icon" type="image/png" href="assets/logo-ls.png?v=57">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/labspace/styles.css?v=56">
-  <script src="/labspace/qrcode.min.js" defer></script>
+  <link rel="stylesheet" href="styles.css?v=57">
+  <script src="qrcode.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js" defer></script>
-  <script src="/labspace/app.js?v=56" defer></script>
+  <script src="app.js?v=57" defer></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link" data-i18n="skip_content">Skip to main content</a>
@@ -22,9 +30,9 @@
   <header class="app-header">
     <div class="header-inner">
       <div class="header-left">
-        <a href="/labspace/" class="brand" data-nav="landing" title="LabSpace Home">
+        <a href="./" class="brand" data-nav="landing" title="LabSpace Home">
           <span class="brand-mark" aria-hidden="true">
-            <img src="/labspace/assets/logo-ls.png?v=53" alt="" width="34" height="34" class="brand-logo-img">
+            <img src="assets/logo-ls.png?v=57" alt="" width="34" height="34" class="brand-logo-img">
           </span>
           <span class="brand-text">
             <span class="brand-name">LabSpace TI</span>
@@ -81,8 +89,8 @@
         </button>
 
         <div class="auth-header-btns" id="auth-guest-actions">
-          <a href="/labspace/login" class="btn btn-secondary btn-sm auth-nav-link" id="btn-open-login" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
-          <a href="/labspace/register" class="btn btn-primary btn-sm auth-nav-link" id="btn-open-register" data-nav="register" data-i18n="btn_register">Register</a>
+          <a href="login" class="btn btn-secondary btn-sm auth-nav-link" id="btn-open-login" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
+          <a href="register" class="btn btn-primary btn-sm auth-nav-link" id="btn-open-register" data-nav="register" data-i18n="btn_register">Register</a>
         </div>
 
         <div class="notif-wrap" id="notif-wrap" hidden>
@@ -1020,13 +1028,13 @@
     <section id="view-login" class="view-panel auth-page-view" aria-labelledby="login-page-title">
       <div class="auth-page-shell">
         <div class="auth-page-topbar">
-          <a href="/labspace/" class="auth-back-link" data-nav="landing">
+          <a href="./" class="auth-back-link" data-nav="landing">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
             <span data-i18n="auth_back_home">Back to Overview</span>
           </a>
           <div class="auth-route-switch" aria-label="Authentication pages">
-            <a href="/labspace/login" class="auth-route-pill is-active" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
-            <a href="/labspace/register" class="auth-route-pill" data-nav="register" data-i18n="btn_register">Register</a>
+            <a href="login" class="auth-route-pill is-active" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
+            <a href="register" class="auth-route-pill" data-nav="register" data-i18n="btn_register">Register</a>
           </div>
         </div>
 
@@ -1099,7 +1107,7 @@
 
               <div class="auth-switch-row">
                 <span data-i18n="auth_no_account">Don't have a student account yet?</span>
-                <a href="/labspace/register" class="auth-switch-link" data-nav="register" data-i18n="auth_go_register">Register here &rarr;</a>
+                <a href="register" class="auth-switch-link" data-nav="register" data-i18n="auth_go_register">Register here &rarr;</a>
               </div>
             </div>
           </div>
@@ -1111,13 +1119,13 @@
     <section id="view-register" class="view-panel auth-page-view" aria-labelledby="register-page-title">
       <div class="auth-page-shell">
         <div class="auth-page-topbar">
-          <a href="/labspace/" class="auth-back-link" data-nav="landing">
+          <a href="./" class="auth-back-link" data-nav="landing">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
             <span data-i18n="auth_back_home">Back to Overview</span>
           </a>
           <div class="auth-route-switch" aria-label="Authentication pages">
-            <a href="/labspace/login" class="auth-route-pill" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
-            <a href="/labspace/register" class="auth-route-pill is-active" data-nav="register" data-i18n="btn_register">Register</a>
+            <a href="login" class="auth-route-pill" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
+            <a href="register" class="auth-route-pill is-active" data-nav="register" data-i18n="btn_register">Register</a>
           </div>
         </div>
 
@@ -1195,7 +1203,7 @@
 
               <div class="auth-switch-row">
                 <span data-i18n="auth_has_account">Already have an account?</span>
-                <a href="/labspace/login" class="auth-switch-link" data-nav="login" data-i18n="auth_go_login">Sign in here &rarr;</a>
+                <a href="login" class="auth-switch-link" data-nav="login" data-i18n="auth_go_login">Sign in here &rarr;</a>
               </div>
             </div>
           </div>

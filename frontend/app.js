@@ -1034,7 +1034,7 @@
           nama: 'Software Engineering Lab',
           namaId: 'Lab Rekayasa Perangkat Lunak',
           lantai: 'Gedung J · Lt. 2',
-          photo: '/labspace/assets/labs/j21.webp',
+          photo: 'assets/labs/j21.webp',
           kapasitas: 40,
           spesifikasi: 'Intel Core i7-13700, 32GB DDR5, 1TB NVMe, Dual-Boot Win 11 & Ubuntu 24.04',
           specsDetail: {
@@ -1055,7 +1055,7 @@
           nama: 'Networking & Security Lab',
           namaId: 'Lab Jaringan & Keamanan Sistem',
           lantai: 'Gedung J · Lt. 2',
-          photo: '/labspace/assets/labs/j22.webp',
+          photo: 'assets/labs/j22.webp',
           kapasitas: 36,
           spesifikasi: 'Intel Core i5-13500, 16GB DDR4, MikroTik RB4011, Cisco Catalyst 2960-X',
           specsDetail: {
@@ -1076,7 +1076,7 @@
           nama: 'Multimedia & Graphics Lab',
           namaId: 'Lab Multimedia & Grafika',
           lantai: 'Gedung J · Lt. 2',
-          photo: '/labspace/assets/labs/j23.webp',
+          photo: 'assets/labs/j23.webp',
           kapasitas: 32,
           spesifikasi: 'Intel Core i7-13700K, RTX 3060 12GB, 32GB DDR5, ASUS ProArt 27" sRGB',
           specsDetail: {
@@ -1097,7 +1097,7 @@
           nama: 'Intelligent Systems & Data Lab',
           namaId: 'Lab Sistem Cerdas & Data',
           lantai: 'Gedung J · Lt. 2',
-          photo: '/labspace/assets/labs/j24.webp',
+          photo: 'assets/labs/j24.webp',
           kapasitas: 30,
           spesifikasi: 'AMD Ryzen 7 7700, RTX 4060 8GB, 32GB DDR5, Ubuntu 24.04 + CUDA 12.6',
           specsDetail: {
@@ -1949,14 +1949,29 @@
     }
   }
 
-  const BASE_PATH =
-    window.location.pathname === '/labspace' || window.location.pathname.startsWith('/labspace/')
-      ? '/labspace'
-      : '';
+  const IS_FILE_PROTO = window.location.protocol === 'file:';
+  const BASE_PATH = (() => {
+    if (IS_FILE_PROTO) return '';
+    const p = window.location.pathname || '/';
+    if (p === '/labspace' || p.startsWith('/labspace/')) return '/labspace';
+    if (p === '/frontend' || p.startsWith('/frontend/')) return '/frontend';
+    return '';
+  })();
+
+  function assetUrl(relPath) {
+    const clean = String(relPath || '')
+      .replace(/^\/?labspace\//, '')
+      .replace(/^\/?frontend\//, '')
+      .replace(/^\/+/, '');
+    if (!clean) return '';
+    if (IS_FILE_PROTO) return clean;
+    return `${BASE_PATH}/${clean}`;
+  }
 
   function viewFromPath(pathname) {
     const clean = (pathname || '/').replace(/\/+$/, '') || '/';
-    const rel = BASE_PATH && clean.startsWith(BASE_PATH) ? (clean.slice(BASE_PATH.length) || '/') : clean;
+    let rel = BASE_PATH && clean.startsWith(BASE_PATH) ? (clean.slice(BASE_PATH.length) || '/') : clean;
+    if (rel === '/index.html') rel = '/';
     if (rel === '/login' || rel === '/signin') return 'login';
     if (rel === '/register' || rel === '/signup') return 'register';
     if (rel === '/schedule' || rel === '/dashboard') return 'monitoring';
@@ -2011,10 +2026,12 @@
     state.activeView = viewName;
     saveState();
 
-    if (syncHistory && window.history && typeof window.history.pushState === 'function') {
+    if (!IS_FILE_PROTO && syncHistory && window.history && typeof window.history.pushState === 'function') {
       const targetUrl = pathForView(viewName);
       if (window.location.pathname !== targetUrl) {
-        window.history.pushState({ view: viewName }, '', targetUrl);
+        try {
+          window.history.pushState({ view: viewName }, '', targetUrl);
+        } catch {}
       }
     }
 
@@ -2652,7 +2669,7 @@
           return `<tr>
             <td data-label="${isId() ? 'Ruang Lab' : 'Lab Room'}">
               <div class="matrix-room-cell">
-                ${lab.photo ? `<img src="${escapeHtml(lab.photo)}" alt="${escapeHtml(labDisplayName(lab))}" class="matrix-thumb" loading="lazy">` : ''}
+                ${lab.photo ? `<img src="${escapeHtml(assetUrl(lab.photo))}" alt="${escapeHtml(labDisplayName(lab))}" class="matrix-thumb" loading="lazy">` : ''}
                 <div>
                   <div style="display:flex;align-items:center;gap:6px;">
                     <span class="lab-code">${escapeHtml(lab.kode)}</span>
@@ -2749,7 +2766,7 @@
     container.innerHTML = `<div class="lab-split-workspace">
       <aside class="lab-split-aside">
         <div class="lab-photo-wrap">
-          <img src="${escapeHtml(lab.photo || '/labspace/assets/labs/j21.webp')}" alt="${escapeHtml(labDisplayName(lab))}" class="lab-photo-img" loading="lazy">
+          <img src="${escapeHtml(assetUrl(lab.photo || 'assets/labs/j21.webp'))}" alt="${escapeHtml(labDisplayName(lab))}" class="lab-photo-img" loading="lazy">
           <span class="lab-photo-caption">${escapeHtml(lab.lantai || 'Gedung J · Lt. 2')} &middot; ${lab.kapasitas} PC</span>
         </div>
         <div class="lab-aside-head">
@@ -3282,7 +3299,7 @@
             ? `${sd.cpu} &middot; ${sd.ram} &middot; ${sd.gpu} &middot; ${sd.os}`
             : lab.spesifikasi;
           return `<article class="student-lab-card">
-            ${lab.photo ? `<img src="${escapeHtml(lab.photo)}" alt="${escapeHtml(labDisplayName(lab))}" class="student-lab-photo" loading="lazy">` : ''}
+            ${lab.photo ? `<img src="${escapeHtml(assetUrl(lab.photo))}" alt="${escapeHtml(labDisplayName(lab))}" class="student-lab-photo" loading="lazy">` : ''}
             <div class="student-lab-head">
               <div>
                 <span class="lab-code">${escapeHtml(lab.kode)}</span>
@@ -3725,7 +3742,7 @@
       <div class="permit-ribbon" aria-hidden="true"></div>
       <div class="permit-header">
         <div class="permit-brand">
-          <img src="/labspace/assets/logo-ls.png?v=53" alt="" width="44" height="44" class="permit-logo">
+          <img src="${escapeHtml(assetUrl('assets/logo-ls.png?v=57'))}" alt="" width="44" height="44" class="permit-logo">
           <div>
             <span class="permit-kicker">${idMode ? 'UNIVERSITAS MUHAMMADIYAH SURAKARTA &middot; FAKULTAS KOMUNIKASI &amp; INFORMATIKA' : 'UNIVERSITAS MUHAMMADIYAH SURAKARTA &middot; FACULTY OF COMMUNICATION &amp; INFORMATICS'}</span>
             <h3>${idMode ? 'SURAT IZIN PENGGUNAAN LABORATORIUM KOMPUTER' : 'COMPUTER LABORATORY USAGE PERMIT'}</h3>

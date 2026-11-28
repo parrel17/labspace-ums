@@ -3,7 +3,29 @@
 Frontend interface for **LabSpace TI UMS** (Computer Laboratory Availability Monitoring & Reservation System, Building J · Informatics Engineering, FKI UMS).
 
 - **Live Preview:** https://labspaceti.web.id/labspace/
-- **Backend / Laravel Repo:** https://github.com/parrel17/labspace-ums
+- **Main Repository:** https://github.com/parrel17/labspace-ums
+
+## Run Locally (`localhost`)
+
+Works out of the box with zero build steps or `npm install`:
+
+### Option 1 — Local SPA Server (Recommended, supports `/login`, `/register`, `/schedule` refresh)
+```bash
+cd frontend
+npm run dev
+# Opens at http://127.0.0.1:3000
+```
+
+### Option 2 — VS Code / Antigravity Live Server
+1. Clone this repository.
+2. Right-click `frontend/index.html` and choose **Open with Live Server**.
+
+### Option 3 — Python / PHP Built-in Server
+```bash
+python3 -m http.server 3000 -d frontend
+# or
+php -S 127.0.0.1:3000 -t frontend
+```
 
 ## Key Features
 
@@ -13,11 +35,3 @@ Frontend interface for **LabSpace TI UMS** (Computer Laboratory Availability Mon
 - **Anti-Clash Reservation & Verification:** Slot conflict detection, student booking manager, and Lab Admin verification console.
 - **QR E-Ticket & Permit PDF:** Digital permit with single-page A4 print layout (`window.print()`).
 - **Account Settings & Bilingual UI:** Profile/security/preferences modal with EN/ID switching and Light/Dark theme.
-
-## Structure
-
-- `index.html` — SPA entry markup and views
-- `styles.css` — Design tokens, layout, responsive rules, and A4 print styles
-- `app.js` — Client-side state, routing, i18n, anti-clash engine, and UI rendering
-- `assets/` — Brand logo (`logo-ls.png`) and Building J lab photography (`labs/j21.webp`–`j24.webp`)
-- `qrcode.min.js` — Client-side QR generator for e-tickets

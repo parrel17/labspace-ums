@@ -1224,6 +1224,9 @@
         return createDefaultState();
       }
       if (parsed.lang !== 'en' && parsed.lang !== 'id') parsed.lang = 'en';
+      if (!parsed.selectedDate || parsed.selectedDate < getWibNow().isoDate) {
+        parsed.selectedDate = getWibNow().isoDate;
+      }
       if (!parsed.calendarMode) parsed.calendarMode = 'daily';
       if (!parsed.monitoringTab) parsed.monitoringTab = '1';
       if (parsed.roomSubTab !== 'schedule' && parsed.roomSubTab !== 'specs') parsed.roomSubTab = 'schedule';
@@ -1588,13 +1591,22 @@
     if (!tanggal || !jamMulai || !jamSelesai) {
       return { ok: false, reason: isId() ? 'Tanggal, jam mulai, dan jam selesai wajib diisi.' : 'Date, start time, and end time are required.' };
     }
-    const wibToday = getWibNow().isoDate;
+    const wib = getWibNow();
+    const wibToday = wib.isoDate;
     if (tanggal < wibToday) {
       return {
         ok: false,
         reason: isId()
           ? 'Tanggal pemakaian sudah lewat. Pilih tanggal hari ini atau mendatang.'
           : 'Selected date is in the past. Please choose today or an upcoming date.'
+      };
+    }
+    if (tanggal === wibToday && timeToMin(jamSelesai) <= wib.minutes) {
+      return {
+        ok: false,
+        reason: isId()
+          ? `Slot ${jamMulai} - ${jamSelesai} hari ini sudah berlalu (sekarang ${wib.hhmm} WIB).`
+          : `Today's ${jamMulai} - ${jamSelesai} slot has already passed (now ${wib.hhmm} WIB).`
       };
     }
     if (getDayIndex(tanggal) === 0) {
@@ -2015,11 +2027,11 @@
     if ((viewName === 'login' || viewName === 'register') && role !== 'guest') {
       viewName = role === 'laboran' ? 'laboran' : 'monitoring';
     }
-    if ((viewName === 'reservasi' || viewName === 'riwayat') && role === 'guest') {
+    if ((viewName === 'reservasi' || viewName === 'riwayat' || viewName === 'finder' || viewName === 'tickets') && role === 'guest') {
       openAuthModal('login', triggerEl, () => switchView(viewName));
       return;
     }
-    if ((viewName === 'reservasi' || viewName === 'riwayat') && role === 'laboran') {
+    if ((viewName === 'reservasi' || viewName === 'riwayat' || viewName === 'finder' || viewName === 'tickets') && role === 'laboran') {
       viewName = 'laboran';
     }
 
@@ -2220,9 +2232,15 @@
 
   function computeDaySlots(lab, isoDate) {
     const dow = getDayIndex(isoDate);
+    const wib = getWibNow();
+    const isPastDay = isoDate < wib.isoDate;
+    const isTodayDate = isoDate === wib.isoDate;
     return TIME_SLOTS.map((slot) => {
       if (lab.status === 'maintenance') {
         return { ...slot, kind: 'maintenance', title: 'Maintenance', detail: null };
+      }
+      if (dow === 0) {
+        return { ...slot, kind: 'past', title: isId() ? 'Tutup (Minggu)' : 'Closed (Sunday)', detail: null };
       }
       const rutin = state.jadwalRutin.find(
         (j) => j.lab_id === lab.id && j.hari === dow && isOverlap(slot.start, slot.end, j.jam_mulai, j.jam_selesai)
@@ -2245,6 +2263,9 @@
           title: `${prefix}: ${res.pemohon_nama}`,
           detail: res
         };
+      }
+      if (isPastDay || (isTodayDate && timeToMin(slot.end) <= wib.minutes)) {
+        return { ...slot, kind: 'past', title: isId() ? 'Waktu Berlalu' : 'Elapsed', detail: null };
       }
       return { ...slot, kind: 'open', title: isId() ? 'Tersedia' : 'Available', detail: null };
     });
@@ -2629,9 +2650,11 @@
               ? 'is-reserved'
               : s.kind === 'pending'
               ? 'is-pending'
+              : s.kind === 'past'
+              ? 'is-past'
               : 'is-maintenance';
           const isCurrent = isTodayView && timeToMin(s.start) <= wib.minutes && wib.minutes < timeToMin(s.end);
-          const dis = s.kind === 'maintenance' ? 'disabled' : '';
+          const dis = s.kind === 'maintenance' || s.kind === 'past' ? 'disabled' : '';
           const payload = encodeURIComponent(JSON.stringify({ labId: lab.id, start: s.start, end: s.end, kind: s.kind, detail: s.detail }));
           return `<button type="button" class="slot-cell ${cls}${isCurrent ? ' is-current-slot' : ''}" data-slot="${payload}" ${dis}>
             <div class="slot-top-row">
@@ -2659,8 +2682,10 @@
                   ? 'is-reserved'
                   : s.kind === 'pending'
                   ? 'is-pending'
+                  : s.kind === 'past'
+                  ? 'is-past'
                   : 'is-maintenance';
-              const dis = s.kind === 'maintenance' ? 'disabled' : '';
+              const dis = s.kind === 'maintenance' || s.kind === 'past' ? 'disabled' : '';
               const payload = encodeURIComponent(JSON.stringify({ labId: lab.id, start: s.start, end: s.end, kind: s.kind, detail: s.detail }));
               return `<button type="button" class="matrix-slot-chip ${cls}" data-slot="${payload}" ${dis} title="${escapeHtml(s.title)}">${s.start}</button>`;
             })
@@ -2763,6 +2788,23 @@
            <span class="mono">${state.calendarMode === 'weekly' ? (isId() ? 'Tampilan Mingguan' : 'Weekly View') : `${formatDisplayDate(state.selectedDate)} · 07:00 – 21:00 WIB`}</span>
          </div>`;
 
+    const displayStatus = (() => {
+      if (lab.status === 'maintenance' || isTodayView) return liveStatus;
+      if (state.selectedDate < wib.isoDate) {
+        return { cls: 'is-maintenance', label: isId() ? 'Tanggal Berlalu' : 'Past Date' };
+      }
+      if (getDayIndex(state.selectedDate) === 0) {
+        return { cls: 'is-maintenance', label: isId() ? 'Tutup (Minggu)' : 'Closed (Sunday)' };
+      }
+      if (labOpenSlots > 0) {
+        return {
+          cls: 'is-now-open',
+          label: isId() ? `${labOpenSlots}/${slots.length} slot tersedia` : `${labOpenSlots}/${slots.length} slots open`
+        };
+      }
+      return { cls: 'is-now-busy', label: isId() ? 'Jadwal Penuh' : 'Fully Booked' };
+    })();
+
     container.innerHTML = `<div class="lab-split-workspace">
       <aside class="lab-split-aside">
         <div class="lab-photo-wrap">
@@ -2774,9 +2816,9 @@
             <span class="lab-code">${escapeHtml(lab.kode)}</span>
             <h2 class="lab-aside-title">${escapeHtml(labDisplayName(lab))}</h2>
           </div>
-          <span class="lab-status-pill ${liveStatus.cls}">
+          <span class="lab-status-pill ${displayStatus.cls}">
             <span class="live-dot" aria-hidden="true"></span>
-            <span>${escapeHtml(liveStatus.label)}</span>
+            <span>${escapeHtml(displayStatus.label)}</span>
           </span>
         </div>
         <div class="lab-aside-chips">${quickChips}</div>
@@ -2813,7 +2855,11 @@
     const endEl = document.getElementById('res-selesai');
     const pesertaEl = document.getElementById('res-peserta');
 
-    if (!dateEl.value) dateEl.value = state.selectedDate;
+    const wibToday = getWibNow().isoDate;
+    dateEl.min = wibToday;
+    if (!dateEl.value || dateEl.value < wibToday) {
+      dateEl.value = state.selectedDate >= wibToday && getDayIndex(state.selectedDate) !== 0 ? state.selectedDate : wibToday;
+    }
     if (!startEl.value) startEl.value = '17:00';
     if (!endEl.value) endEl.value = '19:00';
 
@@ -3341,7 +3387,7 @@
             <td class="mono" data-label="${escapeHtml(tr('col_time'))}">${j.jam_mulai} - ${j.jam_selesai}</td>
             <td data-label="${escapeHtml(tr('col_lab'))}"><span class="lab-code">${escapeHtml(lab ? lab.kode : '-')}</span></td>
             <td data-label="${escapeHtml(tr('col_course'))}"><strong>${escapeHtml(j.mata_kuliah)}</strong> (${escapeHtml(j.kelas)})</td>
-            <td data-label="${escapeHtml(tr('col_instructor'))}">${escapeHtml(j.dosen_pengampu)}</td>
+            <td data-label="${escapeHtml(tr('col_instructor'))}">${escapeHtml(j.pengampu || j.dosen_pengampu || '-')}</td>
           </tr>`;
         })
         .join('');
@@ -3385,7 +3431,7 @@
             <div class="ticket-wallet-info">
               <strong>${escapeHtml(r.keperluan)}</strong>
               <span class="mono">${escapeHtml(formatDisplayDate(r.tanggal))} &middot; ${r.jam_mulai} - ${r.jam_selesai} WIB</span>
-              <span class="field-hint">${isId() ? 'Peserta' : 'Participants'}: ${r.jumlah_peserta} &middot; ${escapeHtml(r.pemohon_nama)}</span>
+              <span class="field-hint">${isId() ? 'Peserta' : 'Participants'}: ${r.peserta ?? r.jumlah_peserta ?? 1} &middot; ${escapeHtml(r.pemohon_nama)}</span>
             </div>
           </div>
           <div class="ticket-wallet-foot">
@@ -3842,8 +3888,6 @@
     d.setAttribute('aria-hidden', 'true');
     const btn = document.getElementById('btn-open-drawer');
     if (btn) btn.setAttribute('aria-expanded', 'false');
-    const ham = document.getElementById('btn-hamburger-menu');
-    if (ham) ham.setAttribute('aria-expanded', 'false');
     if (lenisInstance && !document.querySelector('.modal-backdrop.is-open')) {
       lenisInstance.start();
     }
@@ -3947,6 +3991,8 @@
         if (!inp) return;
         const nextType = inp.type === 'password' ? 'text' : 'password';
         inp.type = nextType;
+        btn.classList.toggle('is-visible', nextType === 'text');
+        btn.setAttribute('aria-pressed', nextType === 'text' ? 'true' : 'false');
         btn.setAttribute('aria-label', nextType === 'text' ? 'Hide password' : 'Show password');
       });
     });
@@ -4018,11 +4064,8 @@
       const email = document.getElementById('reg-email').value.trim().toLowerCase();
       const password = document.getElementById('reg-password').value;
       const errBox = document.getElementById('register-error');
-
-      if (!name || !nim || !email || password.length < 6) {
-        errBox.textContent = isId()
-          ? 'Lengkapi semua data dan kata sandi minimal 6 karakter.'
-          : 'Complete all fields with a password of at least 6 characters.';
+      const shakeReg = (msg) => {
+        errBox.textContent = msg;
         errBox.hidden = false;
         const card = document.getElementById('register-page-card');
         if (card) {
@@ -4030,18 +4073,27 @@
           void card.offsetWidth;
           card.classList.add('is-shaking');
         }
+      };
+
+      if (name.length < 2 || !/^[A-Z0-9-]{5,20}$/.test(nim) || !email || password.length < 6) {
+        shakeReg(
+          isId()
+            ? 'Isi nama (min. 2 huruf), NIM valid, email UMS, dan sandi minimal 6 karakter.'
+            : 'Enter full name (min 2 chars), valid NIM, UMS email, and a 6+ character password.'
+        );
+        return;
+      }
+      if (!/^[^\s@]+@(student\.)?ums\.ac\.id$/i.test(email)) {
+        shakeReg(
+          isId()
+            ? 'Gunakan email resmi @student.ums.ac.id atau @ums.ac.id.'
+            : 'Please use an official @student.ums.ac.id or @ums.ac.id email.'
+        );
         return;
       }
       const exists = state.users.some((u) => u.email.toLowerCase() === email || u.nim.toLowerCase() === nim.toLowerCase());
       if (exists) {
-        errBox.textContent = isId() ? 'NIM atau email sudah terdaftar. Silakan masuk.' : 'Student ID or email is already registered. Please sign in.';
-        errBox.hidden = false;
-        const card = document.getElementById('register-page-card');
-        if (card) {
-          card.classList.remove('is-shaking');
-          void card.offsetWidth;
-          card.classList.add('is-shaking');
-        }
+        shakeReg(isId() ? 'NIM atau email sudah terdaftar. Silakan masuk.' : 'Student ID or email is already registered. Please sign in.');
         return;
       }
       const nextId = state.users.reduce((m, u) => Math.max(m, u.id), 0) + 1;
@@ -4897,6 +4949,8 @@
     });
 
     document.getElementById('mine-tbody').addEventListener('click', (e) => {
+      const me = currentUser();
+      if (!me) return;
       const permitBtn = e.target.closest('[data-view-permit]');
       if (permitBtn) {
         openPermitModal(permitBtn.dataset.viewPermit, permitBtn);
@@ -4905,7 +4959,7 @@
       const editBtn = e.target.closest('[data-edit-res]');
       if (editBtn) {
         const r = state.reservasis.find((x) => x.id === Number(editBtn.dataset.editRes));
-        if (!r) return;
+        if (!r || r.pemohon_nim !== me.nim || r.status !== 'pending') return;
         populateSelects();
         document.getElementById('edit-res-id').value = String(r.id);
         document.getElementById('edit-res-lab').value = String(r.lab_id);
@@ -4922,10 +4976,12 @@
       const cancelBtn = e.target.closest('[data-cancel-res]');
       if (cancelBtn) {
         const id = Number(cancelBtn.dataset.cancelRes);
+        const targetItem = state.reservasis.find((x) => x.id === id);
+        if (!targetItem || targetItem.pemohon_nim !== me.nim || targetItem.status !== 'pending') return;
         const msg = isId() ? 'Batalkan pengajuan reservasi yang masih menunggu persetujuan ini?' : 'Cancel this pending booking request?';
         openConfirm(msg, () => {
           const item = state.reservasis.find((x) => x.id === id);
-          if (item) item.status = 'cancelled';
+          if (item && item.pemohon_nim === me.nim && item.status === 'pending') item.status = 'cancelled';
           saveState();
           updateHeaderAndCounts();
           renderMineTable();
@@ -4936,9 +4992,11 @@
       const delBtn = e.target.closest('[data-delete-res]');
       if (delBtn) {
         const id = Number(delBtn.dataset.deleteRes);
+        const targetItem = state.reservasis.find((x) => x.id === id);
+        if (!targetItem || targetItem.pemohon_nim !== me.nim || (targetItem.status !== 'rejected' && targetItem.status !== 'cancelled')) return;
         const msg = isId() ? 'Hapus riwayat pengajuan ini dari daftar?' : 'Remove this booking record from your history?';
         openConfirm(msg, () => {
-          state.reservasis = state.reservasis.filter((x) => x.id !== id);
+          state.reservasis = state.reservasis.filter((x) => !(x.id === id && x.pemohon_nim === me.nim));
           saveState();
           updateHeaderAndCounts();
           renderMineTable();
@@ -4969,10 +5027,10 @@
         return;
       }
       const target = state.reservasis.find((x) => x.id === id);
-      if (target) {
-        Object.assign(target, { lab_id: labId, tanggal, peserta, jam_mulai: jamMulai, jam_selesai: jamSelesai, keperluan, anggota });
-        saveState();
-      }
+      const me = currentUser();
+      if (!target || !me || target.pemohon_nim !== me.nim || target.status !== 'pending') return;
+      Object.assign(target, { lab_id: labId, tanggal, peserta, jam_mulai: jamMulai, jam_selesai: jamSelesai, keperluan, anggota });
+      saveState();
       closeModal('modal-edit-res');
       renderMineTable();
       showGlobalFeedback(isId() ? 'Perubahan reservasi berhasil disimpan.' : 'Booking changes saved.');
@@ -5072,6 +5130,7 @@
 
     document.getElementById('form-verify').addEventListener('submit', (e) => {
       e.preventDefault();
+      if (currentRole() !== 'laboran') return;
       const id = Number(document.getElementById('verify-res-id').value);
       const action = document.getElementById('verify-action').value;
       let note = document.getElementById('verify-note').value.trim();
@@ -5230,6 +5289,7 @@
 
     document.getElementById('form-lab-crud').addEventListener('submit', (e) => {
       e.preventDefault();
+      if (currentRole() !== 'laboran') return;
       const id = document.getElementById('lab-crud-id').value;
       const nameVal = document.getElementById('lab-crud-nama').value.trim();
       const payload = {
@@ -5299,6 +5359,7 @@
 
     document.getElementById('form-jadwal-crud').addEventListener('submit', (e) => {
       e.preventDefault();
+      if (currentRole() !== 'laboran') return;
       const id = document.getElementById('jadwal-crud-id').value;
       const lab_id = Number(document.getElementById('jadwal-crud-lab').value);
       const hari = Number(document.getElementById('jadwal-crud-hari').value);
@@ -5412,6 +5473,7 @@
       });
       adminBookForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        if (currentRole() !== 'laboran') return;
         const labId = Number(document.getElementById('admin-book-lab').value);
         const tanggal = document.getElementById('admin-book-tanggal').value;
         const peserta = Number(document.getElementById('admin-book-peserta').value);
@@ -5474,7 +5536,12 @@
           r.status
         ]);
       });
-      const csv = rows.map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const safeCsvCell = (v) => {
+        const s = String(v ?? '');
+        const safe = /^[=+\-@\t\r]/.test(s) ? `'${s}` : s;
+        return `"${safe.replace(/"/g, '""')}"`;
+      };
+      const csv = rows.map((row) => row.map(safeCsvCell).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -5576,6 +5643,7 @@
       });
       userCrudForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        if (currentRole() !== 'laboran') return;
         const id = Number(document.getElementById('user-crud-id').value || 0);
         const name = document.getElementById('user-crud-name').value.trim();
         const nim = document.getElementById('user-crud-nim').value.trim().toUpperCase();
@@ -6076,10 +6144,12 @@
       initialView = 'laboran';
     }
     switchView(initialView, null, { syncHistory: false });
-    if (window.history && typeof window.history.replaceState === 'function') {
+    if (!IS_FILE_PROTO && window.history && typeof window.history.replaceState === 'function') {
       const targetUrl = pathForView(state.activeView);
       if (window.location.pathname !== targetUrl) {
-        window.history.replaceState({ view: state.activeView }, '', targetUrl);
+        try {
+          window.history.replaceState({ view: state.activeView }, '', targetUrl);
+        } catch {}
       }
     }
 

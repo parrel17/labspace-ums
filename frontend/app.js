@@ -2175,7 +2175,14 @@
     }
 
     document.querySelectorAll('.view-panel').forEach((p) => {
-      p.classList.toggle('is-active', p.id === `view-${viewName}`);
+      const isTarget = p.id === `view-${viewName}`;
+      if (isTarget) {
+        p.classList.remove('is-active');
+        void p.offsetWidth;
+        p.classList.add('is-active');
+      } else {
+        p.classList.remove('is-active');
+      }
     });
     document.querySelectorAll('[data-nav]').forEach((el) => {
       el.classList.toggle('is-active', el.dataset.nav === viewName);
@@ -3687,7 +3694,7 @@
               .join('')}</div>`
           : '';
         return `<div class="chat-bubble ${m.role === 'user' ? 'is-user' : 'is-bot'}">
-          <div class="chat-meta"><span>${escapeHtml(m.sender)}</span><span>${escapeHtml(m.time)}</span></div>
+          <div class="chat-meta"><span class="chat-sender-tag"><span class="chat-role-dot" aria-hidden="true"></span>${escapeHtml(m.sender)}</span><span class="chat-time">${escapeHtml(m.time)}</span></div>
           <div>${formatChatTextHtml(m.text)}</div>
           ${actionsHtml}
         </div>`;
@@ -3723,7 +3730,7 @@
       csStream.innerHTML = state.csMessages
         .map(
           (m) => `<div class="chat-bubble ${m.role === 'cs' ? 'is-cs' : 'is-user'}">
-            <div class="chat-meta"><span>${escapeHtml(m.sender)} · ${escapeHtml(topicLabels[m.topic] || m.topic)}</span><span>${escapeHtml(m.time)}</span></div>
+            <div class="chat-meta"><span class="chat-sender-tag"><span class="chat-role-dot" aria-hidden="true"></span>${escapeHtml(m.sender)} · ${escapeHtml(topicLabels[m.topic] || m.topic)}</span><span class="chat-time">${escapeHtml(m.time)}</span></div>
             <div>${escapeHtml(m.text)}</div>
           </div>`
         )

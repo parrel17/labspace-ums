@@ -1466,7 +1466,34 @@
         window.gsap.fromTo(
           heroWords,
           { yPercent: 105, opacity: 0 },
-          { yPercent: 0, opacity: 1, duration: 0.6, stagger: 0.04, ease: 'power3.out', clearProps: 'transform,willChange' }
+          { yPercent: 0, opacity: 1, duration: 0.65, stagger: 0.045, ease: 'power3.out', clearProps: 'transform,opacity,willChange' }
+        );
+      }
+
+      const heroSub = document.querySelectorAll('.hero-eyebrow, .hero-lead, .hero-actions, .hero-metric-item');
+      if (heroSub.length) {
+        window.gsap.fromTo(
+          heroSub,
+          { y: 16, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.52, stagger: 0.06, delay: 0.08, ease: 'power3.out', clearProps: 'transform,opacity,willChange' }
+        );
+      }
+
+      const heroCard = document.querySelector('.hero-preview-card');
+      if (heroCard) {
+        window.gsap.fromTo(
+          heroCard,
+          { y: 22, opacity: 0, scale: 0.985 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.58, delay: 0.12, ease: 'power3.out', clearProps: 'transform,opacity,willChange' }
+        );
+      }
+
+      const snapRows = document.querySelectorAll('#hero-snapshot-list .snapshot-row');
+      if (snapRows.length) {
+        window.gsap.fromTo(
+          snapRows,
+          { x: 14, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.42, stagger: 0.055, delay: 0.22, ease: 'power3.out', clearProps: 'transform,opacity,willChange' }
         );
       }
 
@@ -1482,39 +1509,43 @@
             duration: 0.55,
             stagger: 0.035,
             ease: 'power3.out',
-            clearProps: 'transform,willChange',
+            clearProps: 'transform,opacity,willChange',
             scrollTrigger: {
               trigger: heading,
-              start: 'top 86%',
+              start: 'top 88%',
               once: true
             }
           }
         );
       });
 
-      const faqCards = Array.from(document.querySelectorAll('.landing-faq-list .faq-item')).filter((el) => {
-        const rect = el.getBoundingClientRect();
-        return rect.top > window.innerHeight * 0.92;
-      });
-      if (faqCards.length && window.ScrollTrigger) {
+      const scrollStagger = (selector, triggerSelector, opts = {}) => {
+        const els = Array.from(document.querySelectorAll(selector));
+        if (!els.length || !window.ScrollTrigger) return;
         window.gsap.fromTo(
-          faqCards,
-          { y: 18, opacity: 0 },
+          els,
+          { y: opts.y ?? 22, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.44,
-            stagger: 0.07,
+            duration: opts.duration ?? 0.5,
+            stagger: opts.stagger ?? 0.075,
             ease: 'power3.out',
             clearProps: 'transform,opacity,willChange',
             scrollTrigger: {
-              trigger: '.landing-faq-list',
-              start: 'top 86%',
+              trigger: document.querySelector(triggerSelector) || els[0],
+              start: opts.start || 'top 87%',
               once: true
             }
           }
         );
-      }
+      };
+
+      scrollStagger('.landing-feature-card', '.landing-features-grid', { y: 24, stagger: 0.08 });
+      scrollStagger('#landing-labs-grid .landing-lab-card', '#landing-labs-grid', { y: 24, stagger: 0.075 });
+      scrollStagger('.landing-info-card', '.landing-rules-grid', { y: 24, stagger: 0.09 });
+      scrollStagger('.landing-faq-list .faq-item', '.landing-faq-list', { y: 20, stagger: 0.07 });
+      scrollStagger('.landing-cta-card', '.landing-cta-section', { y: 22, stagger: 0 });
 
       const stepCards = Array.from(document.querySelectorAll('.workflow-step-card'));
       const progressBar = document.getElementById('pinned-progress-bar');
@@ -2230,7 +2261,7 @@
 
     if (viewName === 'landing') {
       renderLanding();
-      setupLandingScrollAnimations();
+      if (!options.isBoot) setupLandingScrollAnimations();
     } else if (gsapCtx) {
       gsapCtx.revert();
       gsapCtx = null;
@@ -2448,7 +2479,6 @@
           </article>`;
         })
         .join('');
-      if (animate) animateCardsWithMotion('#landing-labs-grid .landing-lab-card');
     }
   }
 
@@ -6172,9 +6202,12 @@
         } catch {}
       }
     }
-    window.requestAnimationFrame(() => {
-      document.documentElement.classList.remove('ls-booting');
-    });
+    document.documentElement.classList.remove('ls-booting');
+    if (state.activeView === 'landing') {
+      window.requestAnimationFrame(() => {
+        setupLandingScrollAnimations();
+      });
+    }
 
     window.setInterval(() => {
       updateLiveClocks();

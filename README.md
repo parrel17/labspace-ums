@@ -152,6 +152,11 @@ labspace-ums/
 │   ├── factories/
 │   ├── migrations/            # Skema tabel & relasi database
 │   └── seeders/               # Data awal ruangan lab & akun uji coba
+├── frontend/                  # Interactive UI preview (Landing, Auth, Room Workspace, Permit PDF)
+│   ├── assets/                # Logo brand & foto ruang lab Gedung J
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
 ├── public/
 ├── resources/
 │   ├── css/                   # Tailwind CSS entry

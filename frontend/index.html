@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LabSpace TI UMS - Lab Availability &amp; Reservation System</title>
+  <link rel="icon" type="image/png" href="/labspace/assets/logo-ls.png?v=56">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/labspace/styles.css?v=56">
+  <script src="/labspace/qrcode.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js" defer></script>
+  <script src="/labspace/app.js?v=56" defer></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link" data-i18n="skip_content">Skip to main content</a>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/labspace/" class="brand" data-nav="landing" title="LabSpace Home">
+          <span class="brand-mark" aria-hidden="true">
+            <img src="/labspace/assets/logo-ls.png?v=53" alt="" width="34" height="34" class="brand-logo-img">
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">LabSpace TI</span>
+            <span class="brand-sub" data-i18n="brand_sub">Building J FKI UMS</span>
+          </span>
+        </a>
+
+        <span class="header-route-pill" id="header-route-pill" hidden>Lab Availability</span>
+      </div>
+
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <button type="button" class="nav-tab is-active" data-nav="landing" id="nav-tab-landing" data-i18n="nav_overview">
+          Overview
+        </button>
+        <button type="button" class="nav-tab" data-nav="monitoring" id="nav-tab-monitoring" data-i18n="nav_availability">
+          Lab Availability
+        </button>
+        <button type="button" class="nav-tab" data-nav="reservasi" id="nav-tab-reservasi" data-i18n="nav_book">
+          Book a Lab
+        </button>
+        <button type="button" class="nav-tab" data-nav="riwayat" id="nav-tab-riwayat" hidden>
+          <span data-i18n="nav_my_bookings">My Bookings</span>
+          <span class="nav-count" id="nav-count-mine">0</span>
+        </button>
+        <button type="button" class="nav-tab" data-nav="laboran" id="nav-tab-laboran" hidden>
+          <span data-i18n="nav_admin">Lab Console</span>
+          <span class="nav-count" id="nav-count-pending">0</span>
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="header-search-wrap" id="header-search-wrap" hidden>
+          <svg class="cf-search-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="header-quick-search" class="header-search-input" data-i18n-placeholder="ph_quick_search" placeholder="Quick search..." autocomplete="off">
+          <kbd class="cf-kbd">Ctrl+K</kbd>
+          <div id="header-search-results" class="header-search-results" data-lenis-prevent hidden></div>
+        </div>
+
+        <div class="lang-switcher" id="header-lang-guest" role="group" aria-label="Language switcher">
+          <button type="button" class="lang-btn is-active" data-lang="en">EN</button>
+          <button type="button" class="lang-btn" data-lang="id">ID</button>
+        </div>
+
+        <button type="button" class="icon-btn cf-theme-icon-btn" id="btn-theme-toggle" aria-label="Switch theme" aria-pressed="false">
+          <svg class="theme-icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+          </svg>
+          <svg class="theme-icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+
+        <div class="auth-header-btns" id="auth-guest-actions">
+          <a href="/labspace/login" class="btn btn-secondary btn-sm auth-nav-link" id="btn-open-login" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
+          <a href="/labspace/register" class="btn btn-primary btn-sm auth-nav-link" id="btn-open-register" data-nav="register" data-i18n="btn_register">Register</a>
+        </div>
+
+        <div class="notif-wrap" id="notif-wrap" hidden>
+          <button type="button" class="icon-btn" id="btn-notif" aria-label="Notifications" aria-expanded="false" aria-controls="notif-popover">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </button>
+          <span class="notif-badge" id="notif-badge" hidden>0</span>
+          <div id="notif-popover" class="notif-popover" role="region" aria-label="Notifications list" data-lenis-prevent hidden>
+            <div class="notif-head">
+              <span data-i18n="notif_title">Notifications</span>
+              <button type="button" class="footer-reset-btn" id="btn-notif-read" data-i18n="notif_mark_read">Mark all read</button>
+            </div>
+            <div id="notif-list" class="notif-list"></div>
+          </div>
+        </div>
+
+        <button type="button" class="mobile-menu-btn" id="btn-open-drawer" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-drawer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+          <span data-i18n="menu_label">Menu</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-workspace-shell" id="app-workspace-shell">
+    <aside id="cf-sidebar" class="cf-sidebar" aria-label="Workspace navigation sidebar" hidden>
+      <div class="cf-sidebar-head">
+        <div class="cf-account-label">
+          <span class="cf-account-dot" aria-hidden="true"></span>
+          <span id="cf-sidebar-account-title">Workspace</span>
+        </div>
+        <button type="button" class="cf-collapse-btn" id="btn-collapse-sidebar" aria-label="Collapse sidebar" title="Collapse / Expand sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav id="cf-sidebar-nav" class="cf-sidebar-nav" aria-label="Sidebar menu"></nav>
+
+      <div class="cf-sidebar-foot">
+        <div class="user-menu-wrap cf-profile-wrap" id="user-menu-wrap" hidden>
+          <button type="button" class="user-pill cf-profile-btn" id="btn-user-menu" aria-expanded="false" aria-controls="user-menu-popover">
+            <span class="user-avatar" id="user-avatar" aria-hidden="true"><span class="user-online-dot"></span></span>
+            <span class="user-meta cf-profile-meta">
+              <strong id="user-name">Bagas Prakoso</strong>
+              <span id="user-nim">L200240081</span>
+            </span>
+            <svg class="user-chevron cf-profile-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+          </button>
+          <div id="user-menu-popover" class="user-menu-popover cf-profile-popover" role="region" aria-label="Account menu" data-lenis-prevent hidden>
+            <div class="user-menu-head">
+              <div class="user-menu-hero">
+                <div class="user-avatar-lg" id="menu-user-avatar" aria-hidden="true"><span class="user-online-dot"></span></div>
+                <div class="user-menu-identity">
+                  <div class="user-menu-name-row">
+                    <strong id="menu-user-name">Bagas Prakoso</strong>
+                    <span class="user-role-pill" id="menu-user-role-pill">Student</span>
+                  </div>
+                  <div class="user-menu-id-row">
+                    <span class="mono" id="menu-user-nim">L200240081</span>
+                    <button type="button" class="user-copy-btn" id="btn-copy-user-id" title="Copy ID / NIM" aria-label="Copy ID or NIM">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                  <span class="user-menu-email" id="menu-user-email">l200240081@student.ums.ac.id</span>
+                </div>
+              </div>
+            </div>
+            <div class="user-menu-stats">
+              <div class="user-stat-tile">
+                <strong id="menu-stat-1-val" class="mono">0</strong>
+                <span id="menu-stat-1-lbl">Active</span>
+              </div>
+              <div class="user-stat-tile">
+                <strong id="menu-stat-2-val" class="mono">0</strong>
+                <span id="menu-stat-2-lbl">Approved</span>
+              </div>
+            </div>
+            <div class="user-menu-actions">
+              <button type="button" class="user-menu-item" id="menu-edit-profile">
+                <span class="user-menu-item-left">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span data-i18n="menu_edit_profile">Edit Profile &amp; Password</span>
+                </span>
+                <span class="user-menu-arrow">&rsaquo;</span>
+              </button>
+              <button type="button" class="user-menu-item" id="menu-role-shortcut">
+                <span class="user-menu-item-left">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="13" y2="13"/></svg>
+                  <span id="menu-role-shortcut-lbl">My Bookings &amp; E-Tickets</span>
+                </span>
+                <span class="user-menu-arrow">&rsaquo;</span>
+              </button>
+              <button type="button" class="user-menu-item" id="menu-go-overview" data-nav="landing">
+                <span class="user-menu-item-left">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>
+                  <span data-i18n="nav_overview">Overview</span>
+                </span>
+                <span class="user-menu-arrow">&rsaquo;</span>
+              </button>
+              <div class="user-menu-divider"></div>
+              <button type="button" class="user-menu-item is-danger" id="btn-logout">
+                <span class="user-menu-item-left">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  <span data-i18n="btn_sign_out">Sign Out</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main id="main-content" class="main-container">
+    <div class="page-head" id="workspace-page-head" hidden>
+      <div>
+        <h1 id="workspace-title">Laboratory Room Availability</h1>
+        <p class="page-subtitle" id="workspace-subtitle">Check routine practicum blocks and available hours in Building J before heading to the lab.</p>
+      </div>
+      <div class="page-head-actions">
+        <span class="wib-clock-pill" id="live-wib-clock" aria-label="Campus time">--:-- WIB</span>
+        <button type="button" class="btn btn-primary" id="btn-quick-book" data-i18n="cta_request_lab">Request Lab Usage</button>
+      </div>
+    </div>
+
+    <div id="global-feedback" class="alert-box alert-ok" role="status" aria-live="polite" hidden></div>
+
+    <!-- VIEW 0: LANDING / OVERVIEW PAGE -->
+    <section id="view-landing" class="view-panel is-active" aria-label="LabSpace Overview">
+      <div class="landing-hero">
+        <div class="hero-content">
+          <div class="hero-kicker-row">
+            <span class="hero-kicker" data-i18n="hero_kicker">Informatics Engineering · Building J FKI UMS</span>
+            <span class="wib-clock-pill" id="landing-wib-clock">--:-- WIB</span>
+          </div>
+          <h1 class="hero-title word-reveal" id="hero-title" data-i18n-words="hero_title">
+            Real-time computer lab scheduling and booking for Building J.
+          </h1>
+          <p class="hero-desc" data-i18n="hero_desc">
+            Check empty rooms between regular practicum classes, avoid double-booked slots automatically, and obtain an official lab permit e-ticket in one place.
+          </p>
+          <div class="hero-cta-row">
+            <button type="button" class="btn btn-primary" id="btn-hero-explore" data-i18n="hero_cta_explore">Explore Lab Schedule</button>
+            <button type="button" class="btn btn-secondary" id="btn-hero-auth" data-i18n="hero_cta_auth">Sign In / Register</button>
+          </div>
+          <div class="hero-live-strip" id="hero-live-strip">
+            <div class="hero-live-item">
+              <span class="hero-live-label" data-i18n="stat_active_rooms">Operational Labs</span>
+              <strong id="hero-stat-labs">3 / 4</strong>
+            </div>
+            <div class="hero-live-item">
+              <span class="hero-live-label" data-i18n="stat_open_today">Open Slots Today</span>
+              <strong class="is-open-txt" id="hero-stat-open">0</strong>
+            </div>
+            <div class="hero-live-item">
+              <span class="hero-live-label" data-i18n="stat_hours">Operating Hours</span>
+              <strong>07:00 - 21:00 WIB</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-preview-card" aria-label="Live snapshot of Building J rooms">
+          <div class="hero-preview-head">
+            <span class="mono" data-i18n="hero_snapshot_label">LIVE SNAPSHOT · BUILDING J</span>
+            <button type="button" class="btn-ghost-pill" data-nav="monitoring" data-i18n="hero_open_board">Open Full Board &rarr;</button>
+          </div>
+          <div id="hero-snapshot-list" class="hero-snapshot-list"></div>
+        </div>
+      </div>
+
+      <!-- PINNED WORKFLOW SECTION (GSAP + ScrollTrigger) -->
+      <section class="pinned-section" id="landing-pinned-section" aria-labelledby="pinned-title">
+        <div class="pinned-grid" id="landing-pinned-wrap">
+          <div class="pinned-left">
+            <span class="section-eyebrow" data-i18n="pinned_eyebrow">HOW LABSPACE WORKS</span>
+            <h2 class="pinned-heading word-reveal" id="pinned-title" data-i18n-words="pinned_title">
+              Four structured steps from checking empty rooms to key pickup.
+            </h2>
+            <p class="pinned-lead" data-i18n="pinned_lead">
+              Built around real student and lab technician workflows so students never guess room availability and technicians never process clashing bookings.
+            </p>
+            <div class="pinned-progress-track" aria-hidden="true">
+              <div class="pinned-progress-fill" id="pinned-progress-bar"></div>
+            </div>
+            <div class="pinned-step-counter">
+              <span class="mono" id="pinned-step-num">01 / 04</span>
+              <span id="pinned-step-caption" data-i18n="step1_title">Check Live Availability</span>
+            </div>
+          </div>
+
+          <div class="pinned-steps" id="pinned-steps-list">
+            <article class="workflow-step-card is-active" data-step="0">
+              <span class="step-num mono">01</span>
+              <div>
+                <h3 data-i18n="step1_title">Check Live Availability</h3>
+                <p data-i18n="step1_desc">Browse daily 07:00 - 21:00 time slots and weekly overviews across rooms J.2.1 through J.2.4, including live hardware specs.</p>
+              </div>
+            </article>
+            <article class="workflow-step-card" data-step="1">
+              <span class="step-num mono">02</span>
+              <div>
+                <h3 data-i18n="step2_title">Anti-Clash Reservation Form</h3>
+                <p data-i18n="step2_desc">Select an open slot and the engine immediately validates against routine practicums, maintenance status, room capacity, and active bookings.</p>
+              </div>
+            </article>
+            <article class="workflow-step-card" data-step="2">
+              <span class="step-num mono">03</span>
+              <div>
+                <h3 data-i18n="step3_title">Lab Technician Verification</h3>
+                <p data-i18n="step3_desc">Building J lab staff review pending requests in a dedicated console with automatic re-validation before approval.</p>
+              </div>
+            </article>
+            <article class="workflow-step-card" data-step="3">
+              <span class="step-num mono">04</span>
+              <div>
+                <h3 data-i18n="step4_title">Official E-Ticket &amp; PDF Permit</h3>
+                <p data-i18n="step4_desc">Approved requests generate a printable UMS Informatics lab permit with ticket QR code for key pickup at the 2nd-floor technician room.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- KEY CAPABILITIES BENTO -->
+      <section class="landing-features-section" aria-labelledby="features-title">
+        <div class="section-head-row">
+          <div>
+            <span class="section-eyebrow" data-i18n="features_eyebrow">CORE CAPABILITIES</span>
+            <h2 class="section-title word-reveal" id="features-title" data-i18n-words="features_title">
+              Everything needed for smooth Building J lab operations.
+            </h2>
+          </div>
+          <button type="button" class="btn btn-secondary" data-nav="finder" data-i18n="features_cta">Try Smart Slot Finder</button>
+        </div>
+        <div class="landing-features-grid">
+          <article class="landing-feature-card">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <h3 data-i18n="feat1_title">Smart Slot Finder</h3>
+            <p data-i18n="feat1_desc">Filter open 1 to 3-hour blocks by target date, minimum PC count, and required lab software such as Docker, Python, or Figma.</p>
+          </article>
+          <article class="landing-feature-card">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            </div>
+            <h3 data-i18n="feat2_title">Anti-Clash Engine</h3>
+            <p data-i18n="feat2_desc">Every submission checks routine weekly practicums, maintenance locks, room capacity, and existing reservations automatically.</p>
+          </article>
+          <article class="landing-feature-card">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h4v4H7z"/><line x1="14" y1="10" x2="17" y2="10"/><line x1="14" y1="14" x2="17" y2="14"/></svg>
+            </div>
+            <h3 data-i18n="feat3_title">QR E-Ticket &amp; Permit</h3>
+            <p data-i18n="feat3_desc">Approved requests enter your E-Ticket Wallet with a scannable QR pass and printable official FKI UMS lab permit PDF.</p>
+          </article>
+          <article class="landing-feature-card">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <h3 data-i18n="feat4_title">LabSpace AI &amp; Live CS</h3>
+            <p data-i18n="feat4_desc">Query instant room availability via LabSpace AI or reach Building J technicians directly during service hours.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ROOM FLEET SHOWCASE -->
+      <section class="landing-labs-section" aria-labelledby="showcase-title">
+        <div class="section-head-row">
+          <div>
+            <span class="section-eyebrow" data-i18n="showcase_eyebrow">BUILDING J ROOMS</span>
+            <h2 class="section-title word-reveal" id="showcase-title" data-i18n-words="showcase_title">
+              Four computer laboratories ready for coursework and group projects.
+            </h2>
+          </div>
+          <button type="button" class="btn btn-secondary" data-nav="monitoring" data-i18n="showcase_btn">View Interactive Schedule</button>
+        </div>
+        <div id="landing-labs-grid" class="landing-labs-grid"></div>
+      </section>
+
+      <!-- LAB GUIDELINES & SERVICE DESK -->
+      <section class="landing-rules-section" aria-labelledby="rules-title">
+        <div class="landing-rules-grid">
+          <article class="landing-info-card">
+            <span class="section-eyebrow" data-i18n="rules_eyebrow">KEY PICKUP &amp; GUIDELINES</span>
+            <h2 class="landing-info-title" id="rules-title" data-i18n="rules_title">Building J Laboratory Usage Rules</h2>
+            <ul class="landing-rules-list">
+              <li>
+                <span class="rule-index mono">01</span>
+                <div>
+                  <strong data-i18n="rule1_title">Valid Student ID (KTM) Required</strong>
+                  <p data-i18n="rule1_desc">Show your approved QR E-Ticket and deposit an active UMS KTM at the 2nd-floor technician room when collecting keys.</p>
+                </div>
+              </li>
+              <li>
+                <span class="rule-index mono">02</span>
+                <div>
+                  <strong data-i18n="rule2_title">15-Minute Check-In Tolerance</strong>
+                  <p data-i18n="rule2_desc">Arrive within 15 minutes of your approved start time; unclaimed rooms may be released for other student teams.</p>
+                </div>
+              </li>
+              <li>
+                <span class="rule-index mono">03</span>
+                <div>
+                  <strong data-i18n="rule3_title">Protect Workstations &amp; Cleanliness</strong>
+                  <p data-i18n="rule3_desc">No food or beverages inside lab rooms. Do not alter BIOS, network routing, or pre-installed practicum software.</p>
+                </div>
+              </li>
+              <li>
+                <span class="rule-index mono">04</span>
+                <div>
+                  <strong data-i18n="rule4_title">Respect Routine Practicum Blocks</strong>
+                  <p data-i18n="rule4_desc">Regular academic classes hold priority; check out and return keys cleanly before the next scheduled session.</p>
+                </div>
+              </li>
+            </ul>
+          </article>
+
+          <aside class="landing-info-card is-desk">
+            <span class="section-eyebrow" data-i18n="desk_eyebrow">SERVICE DESK · FKI UMS</span>
+            <h2 class="landing-info-title" data-i18n="desk_title">Building J Floor 2 Technician Desk</h2>
+            <p class="landing-desk-lead" data-i18n="desk_desc">Need help verifying a group booking, installing specialized coursework tools, or unlocking a lab outside regular slots?</p>
+            <dl class="landing-desk-meta">
+              <div>
+                <dt data-i18n="desk_loc_lbl">Location</dt>
+                <dd data-i18n="desk_loc_val">Building J, 2nd Floor · Informatics Lab Office (J.2.1 – J.2.4)</dd>
+              </div>
+              <div>
+                <dt data-i18n="desk_addr_lbl">Campus Address</dt>
+                <dd data-i18n="desk_addr_val">Kampus II Pabelan - Kartasura · Jl. Ahmad Yani, Pabelan, Kartasura, Sukoharjo 57169</dd>
+              </div>
+              <div class="desk-meta-split">
+                <div>
+                  <dt data-i18n="desk_hours_lbl">Technician Hours</dt>
+                  <dd class="mono" data-i18n="desk_hours_val">Mon – Sat · 07:30 – 17:00 WIB</dd>
+                </div>
+                <div>
+                  <dt data-i18n="desk_access_lbl">Lab Operating Window</dt>
+                  <dd class="mono">07:00 – 21:00 WIB</dd>
+                </div>
+              </div>
+            </dl>
+            <div class="landing-map-card">
+              <div class="landing-map-head">
+                <span class="landing-map-badge">Gedung J · FKI UMS · Lantai 2</span>
+                <a href="https://maps.google.com/?q=-7.556561,110.771026" target="_blank" rel="noopener noreferrer" class="landing-map-link" data-i18n="desk_open_maps">Open Google Maps ↗</a>
+              </div>
+              <iframe
+                class="landing-map-frame"
+                title="Gedung J FKI UMS Kampus II Pabelan Map"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=110.7675%2C-7.5588%2C110.7745%2C-7.5542&amp;layer=mapnik&amp;marker=-7.55656%2C110.77103"></iframe>
+            </div>
+            <div class="landing-desk-actions">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-landing-open-ai" data-i18n="desk_btn_ai">Ask LabSpace AI</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-landing-open-cs" data-i18n="desk_btn_cs">Chat Lab Staff (CS)</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- FAQ ACCORDION -->
+      <section class="landing-faq-section" aria-labelledby="faq-title">
+        <div class="section-head-row">
+          <div>
+            <span class="section-eyebrow" data-i18n="faq_eyebrow">FREQUENTLY ASKED</span>
+            <h2 class="section-title word-reveal" id="faq-title" data-i18n-words="faq_title">
+              Common questions about lab booking and permits.
+            </h2>
+          </div>
+        </div>
+        <div class="landing-faq-list">
+          <details class="faq-item is-expanded" open>
+            <summary>
+              <span data-i18n="faq1_q">How long does Lab Technician approval take after submitting?</span>
+              <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-answer-wrap">
+              <p data-i18n="faq1_a">Requests submitted during service hours (Mon – Sat, 07:30 – 17:00 WIB) are typically reviewed within 15 to 45 minutes. Once approved, your QR E-Ticket and notification appear automatically.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>
+              <span data-i18n="faq2_q">Can I edit or cancel a reservation if my team schedule changes?</span>
+              <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-answer-wrap">
+              <p data-i18n="faq2_a">Yes. Open My Bookings while your request is still Pending to edit the room, time slot, or participant count—or cancel anytime so the slot opens back up for other students.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>
+              <span data-i18n="faq3_q">Do all team members need to book separately for one project session?</span>
+              <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-answer-wrap">
+              <p data-i18n="faq3_a">No. Only one person in charge (PIC) needs to submit the booking, then list the total participants and team members inside the form.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>
+              <span data-i18n="faq4_q">Why is a specific room marked as Maintenance?</span>
+              <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-answer-wrap">
+              <p data-i18n="faq4_a">Labs under hardware upgrades, OS imaging, or exam setup are temporarily locked by Lab Staff. Use Smart Slot Finder to immediately locate another operational room with matching software.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- FINAL CTA SECTION -->
+      <section class="landing-cta-section">
+        <div class="landing-cta-card">
+          <h2 class="landing-cta-title word-reveal" id="landing-cta-title" data-i18n-words="cta_final_title">
+            Ready to book a lab session in Building J?
+          </h2>
+          <p data-i18n="cta_final_desc">Check live availability right now or sign in with your UMS student account to submit a request.</p>
+          <div class="hero-cta-row">
+            <button type="button" class="btn btn-primary" data-nav="monitoring" data-i18n="hero_cta_explore">Explore Lab Schedule</button>
+            <button type="button" class="btn btn-secondary" id="btn-cta-login" data-i18n="hero_cta_auth">Sign In / Register</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- VIEW 1: MONITORING KETERSEDIAAN LAB -->
+    <section id="view-monitoring" class="view-panel" aria-labelledby="workspace-title">
+      <div class="summary-strip is-slim" aria-label="Today availability summary">
+        <div class="summary-item">
+          <div class="summary-item-main">
+            <span class="summary-label" data-i18n="metric_total_labs">Total Labs</span>
+            <span class="summary-note" id="stat-active-labs">0 ready</span>
+          </div>
+          <span class="summary-value" id="stat-total-labs">0</span>
+        </div>
+        <div class="summary-item">
+          <div class="summary-item-main">
+            <span class="summary-label" data-i18n="metric_open_slots">Open Slots (Date)</span>
+            <span class="summary-note" data-i18n="metric_open_note">Click green slot to book</span>
+          </div>
+          <span class="summary-value" id="stat-open-slots">0</span>
+        </div>
+        <div class="summary-item">
+          <div class="summary-item-main">
+            <span class="summary-label" data-i18n="metric_practicum">Routine Practicums</span>
+            <span class="summary-note" data-i18n="metric_practicum_note">Scheduled class sessions</span>
+          </div>
+          <span class="summary-value" id="stat-practicum-slots">0</span>
+        </div>
+        <div class="summary-item">
+          <div class="summary-item-main">
+            <span class="summary-label" data-i18n="metric_booked">Active Reservations</span>
+            <span class="summary-note" id="stat-pending-note">0 pending verification</span>
+          </div>
+          <span class="summary-value" id="stat-booked-slots">0</span>
+        </div>
+      </div>
+
+      <div class="toolbar-card command-bar">
+        <div class="command-top">
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <label for="lab-search" class="sr-only" data-i18n="search_lab_label">Search lab code or specs</label>
+            <input type="text" id="lab-search" class="input search-input" data-i18n-placeholder="search_lab_ph" placeholder="Search code, RTX, Ubuntu, MikroTik...">
+            <button type="button" class="search-clear" id="btn-clear-search" aria-label="Clear search" hidden>✕</button>
+          </div>
+
+          <div class="date-controls">
+            <div class="segmented-ctrl" role="group" aria-label="Calendar mode">
+              <button type="button" class="seg-btn is-active" data-cal-mode="daily" data-i18n="cal_daily">Daily</button>
+              <button type="button" class="seg-btn" data-cal-mode="weekly" data-i18n="cal_weekly">Weekly</button>
+            </div>
+            <div class="date-stepper" role="group" aria-label="Date navigation">
+              <button type="button" class="stepper-btn" id="btn-prev-day" aria-label="Previous day">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <label class="stepper-date" for="filter-date">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="filter-day-name">Fri, 27 Nov 2026</span>
+                <input type="date" id="filter-date" class="stepper-native-date" aria-label="Pick date">
+              </label>
+              <button type="button" class="stepper-btn" id="btn-next-day" aria-label="Next day">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <button type="button" class="btn-ghost-pill" id="btn-today" data-i18n="btn_today">Today</button>
+          </div>
+        </div>
+
+        <div class="command-bottom">
+          <div class="filter-chips" role="group" aria-label="Filter rooms">
+            <button type="button" class="chip-btn is-active" data-lab-filter="all" data-i18n="filter_all">All</button>
+            <button type="button" class="chip-btn" data-lab-filter="now" data-i18n="filter_now">Open Now</button>
+            <button type="button" class="chip-btn" data-lab-filter="available" data-i18n="filter_avail">Has Open Slots</button>
+            <button type="button" class="chip-btn" data-lab-filter="maintenance" data-i18n="filter_maint">Maintenance</button>
+          </div>
+          <span class="field-hint" id="lab-filter-count">Showing all labs</span>
+        </div>
+      </div>
+
+      <div class="legend-bar" aria-label="Schedule status legend">
+        <span class="legend-item"><span class="swatch swatch-open" aria-hidden="true"></span> <span data-i18n="legend_open">Available (click to book)</span></span>
+        <span class="legend-item"><span class="swatch swatch-busy" aria-hidden="true"></span> <span data-i18n="legend_prac">Routine Practicum</span></span>
+        <span class="legend-item"><span class="swatch swatch-reserved" aria-hidden="true"></span> <span data-i18n="legend_res">Reserved (Approved)</span></span>
+        <span class="legend-item"><span class="swatch swatch-pending" aria-hidden="true"></span> <span data-i18n="legend_pend">Pending Verification</span></span>
+      </div>
+
+      <div id="monitoring-loading" class="loading-bar" aria-live="polite" data-i18n="loading_labs">Loading laboratory schedule...</div>
+      <div id="monitoring-room-tabs" class="room-tabs-bar" role="tablist" aria-label="Select laboratory room"></div>
+      <div id="lab-monitoring-list" class="lab-list"></div>
+      <div id="monitoring-empty" class="state-box" hidden>
+        <h3 data-i18n="empty_labs_title">No laboratories match your filters</h3>
+        <p data-i18n="empty_labs_desc">Adjust status filters or pick another date to see available rooms.</p>
+        <button type="button" class="btn btn-secondary" id="btn-clear-lab-filter" data-i18n="btn_show_all_labs">Show All Labs</button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: FORM PENGAJUAN RESERVASI + ANTI-BENTROK -->
+    <section id="view-reservasi" class="view-panel" aria-labelledby="workspace-title">
+      <div class="form-layout">
+        <div class="panel-card">
+          <h2 data-i18n="form_book_title">Lab Usage Request Form</h2>
+          <p class="panel-desc" data-i18n="form_book_desc">Automatic conflict checks run against routine practicums and existing bookings.</p>
+
+          <form id="form-reservasi" novalidate>
+            <div class="form-grid">
+              <div class="field is-full">
+                <label for="res-lab" data-i18n="lbl_lab_room">Laboratory Room</label>
+                <select id="res-lab" name="lab_id" class="select" required></select>
+                <div id="res-lab-spec-card" class="res-lab-spec-card" aria-live="polite"></div>
+              </div>
+
+              <div class="field">
+                <label for="res-tanggal" data-i18n="lbl_usage_date">Usage Date</label>
+                <input type="date" id="res-tanggal" name="tanggal" class="input" required>
+              </div>
+
+              <div class="field">
+                <label for="res-peserta" data-i18n="lbl_participants">Number of Students</label>
+                <input type="number" id="res-peserta" name="peserta" class="input" min="1" max="60" value="3" required>
+                <span class="field-hint" id="res-capacity-hint">Maximum capacity follows the selected lab.</span>
+              </div>
+
+              <div class="field">
+                <label for="res-mulai" data-i18n="lbl_start_time">Start Time</label>
+                <select id="res-mulai" name="jam_mulai" class="select" required></select>
+              </div>
+
+              <div class="field">
+                <label for="res-selesai" data-i18n="lbl_end_time">End Time</label>
+                <select id="res-selesai" name="jam_selesai" class="select" required></select>
+              </div>
+
+              <div class="field is-full">
+                <label for="res-keperluan" data-i18n="lbl_purpose">Activity Purpose</label>
+                <input type="text" id="res-keperluan" name="keperluan" class="input" data-i18n-placeholder="ph_purpose" placeholder="e.g., Web Programming final project development" required>
+              </div>
+
+              <div class="field is-full">
+                <label for="res-anggota" data-i18n="lbl_members">Team Members (Name and Student ID)</label>
+                <textarea id="res-anggota" name="anggota" class="textarea" data-i18n-placeholder="ph_members" placeholder="Bagas Prakoso (L200240081), Nadia Larasati (L200240147)" required></textarea>
+              </div>
+            </div>
+
+            <div id="conflict-check-box" class="alert-box alert-ok" role="status" aria-live="polite" style="margin-top: 16px;"></div>
+
+            <div class="action-group" style="margin-top: 16px;">
+              <button type="submit" class="btn btn-primary" id="btn-submit-reservasi" data-i18n="btn_submit_booking">Submit Reservation</button>
+              <button type="button" class="btn btn-secondary" data-nav="monitoring" data-i18n="btn_back_schedule">Back to Schedule</button>
+            </div>
+          </form>
+        </div>
+
+        <aside class="panel-card" aria-label="Occupied schedule for selected lab and date">
+          <h2 data-i18n="aside_title">Selected Lab Agenda</h2>
+          <p class="panel-desc" id="aside-schedule-desc">Occupied time blocks for the selected date.</p>
+          <div id="aside-schedule-list" class="agenda-list"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- VIEW 3: RESERVASI SAYA + E-TIKET PDF -->
+    <section id="view-riwayat" class="view-panel" aria-labelledby="workspace-title">
+      <div class="toolbar-card">
+        <div class="filter-chips" role="group" aria-label="Filter booking status">
+          <button type="button" class="chip-btn is-active" data-mine-filter="all" data-i18n="status_all">All</button>
+          <button type="button" class="chip-btn" data-mine-filter="pending" data-i18n="status_pending">Pending</button>
+          <button type="button" class="chip-btn" data-mine-filter="approved" data-i18n="status_approved">Approved</button>
+          <button type="button" class="chip-btn" data-mine-filter="rejected" data-i18n="status_rejected">Rejected / Cancelled</button>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" data-nav="reservasi" data-i18n="btn_new_request">+ New Request</button>
+      </div>
+
+      <div id="mine-table-wrap" class="table-wrap">
+        <table class="data-table data-table-cards">
+          <thead>
+            <tr>
+              <th data-i18n="col_code">Code</th>
+              <th data-i18n="col_lab_date">Lab &amp; Date</th>
+              <th data-i18n="col_time">Time</th>
+              <th data-i18n="col_purpose">Purpose</th>
+              <th data-i18n="col_status">Status</th>
+              <th data-i18n="col_action">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="mine-tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="mine-empty" class="state-box" hidden>
+        <h3 data-i18n="empty_mine_title">No reservations yet</h3>
+        <p data-i18n="empty_mine_desc">Choose an open green slot on Lab Availability to submit a booking request.</p>
+        <button type="button" class="btn btn-primary" data-nav="monitoring" data-i18n="btn_check_schedule">View Lab Schedule</button>
+      </div>
+    </section>
+
+    <!-- VIEW 4: PANEL LABORAN -->
+    <section id="view-laboran" class="view-panel" aria-labelledby="workspace-title">
+      <div id="laboran-role-guard" class="state-box" hidden>
+        <h3 data-i18n="guard_title">Lab Technician Access Required</h3>
+        <p data-i18n="guard_desc">This workspace is restricted to Lab Technician accounts. Sign in as a Lab Technician to verify requests and manage rooms.</p>
+        <button type="button" class="btn btn-primary" id="btn-login-laboran-guard" data-i18n="btn_login_laboran">Sign In as Lab Technician</button>
+      </div>
+
+      <div id="laboran-workspace">
+        <div class="summary-strip" aria-label="Lab operations summary">
+          <div class="summary-item is-clickable" data-metric-jump="verifikasi:pending" role="button" tabindex="0">
+            <span class="summary-label" data-i18n="lmetric_pending">Needs Verification</span>
+            <span class="summary-value" id="lstat-pending">0</span>
+            <span class="summary-note" data-i18n="lmetric_pending_note">Pending requests</span>
+          </div>
+          <div class="summary-item is-clickable" data-metric-jump="verifikasi:approved" role="button" tabindex="0">
+            <span class="summary-label" data-i18n="lmetric_approved">Approved</span>
+            <span class="summary-value" id="lstat-approved">0</span>
+            <span class="summary-note" data-i18n="lmetric_approved_note">E-tickets ready</span>
+          </div>
+          <div class="summary-item is-clickable" data-metric-jump="labs" role="button" tabindex="0">
+            <span class="summary-label" data-i18n="lmetric_labs">Operational Labs</span>
+            <span class="summary-value" id="lstat-labs-aktif">0 / 0</span>
+            <span class="summary-note" id="lstat-labs-maint">0 maintenance</span>
+          </div>
+          <div class="summary-item is-clickable" data-metric-jump="jadwal" role="button" tabindex="0">
+            <span class="summary-label" data-i18n="lmetric_jadwal">Routine Schedule</span>
+            <span class="summary-value" id="lstat-jadwal-count">0</span>
+            <span class="summary-note" data-i18n="lmetric_jadwal_note">Weekly practicum sessions</span>
+          </div>
+        </div>
+
+        <div class="subtabs" role="tablist" aria-label="Lab technician modules">
+          <button type="button" class="subtab-btn is-active" role="tab" aria-selected="true" data-ltab="verifikasi">
+            <span data-i18n="ltab_verif">Verification Queue</span> <span class="nav-count" id="ltab-count-pending">0</span>
+          </button>
+          <button type="button" class="subtab-btn" role="tab" aria-selected="false" data-ltab="labs" data-i18n="ltab_labs">
+            Lab Rooms
+          </button>
+          <button type="button" class="subtab-btn" role="tab" aria-selected="false" data-ltab="jadwal" data-i18n="ltab_jadwal">
+            Practicum Schedule
+          </button>
+          <button type="button" class="subtab-btn" role="tab" aria-selected="false" data-ltab="rekap" data-i18n="ltab_rekap">
+            Usage Summary
+          </button>
+          <button type="button" class="subtab-btn" role="tab" aria-selected="false" data-ltab="users">
+            <span data-i18n="ltab_users">User Accounts</span> <span class="nav-count" id="ltab-count-users">0</span>
+          </button>
+        </div>
+
+        <!-- Subpanel A: Antrean Verifikasi -->
+        <div id="lpanel-verifikasi" class="laboran-subpanel is-active">
+          <div class="toolbar-card command-bar">
+            <div class="command-top">
+              <div class="search-wrap">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <label for="admin-verif-search" class="sr-only">Search applicant or ticket</label>
+                <input type="text" id="admin-verif-search" class="input search-input" data-i18n-placeholder="ph_search_verif" placeholder="Search applicant, student ID, ticket, or lab...">
+                <button type="button" class="search-clear" id="btn-clear-verif-search" aria-label="Clear search" hidden>✕</button>
+              </div>
+              <div class="filter-chips" role="group" aria-label="Filter verification status">
+                <button type="button" class="chip-btn is-active" data-verif-filter="all" data-i18n="status_all">All</button>
+                <button type="button" class="chip-btn" data-verif-filter="pending" data-i18n="status_pending">Pending</button>
+                <button type="button" class="chip-btn" data-verif-filter="approved" data-i18n="status_approved">Approved</button>
+                <button type="button" class="chip-btn" data-verif-filter="rejected" data-i18n="status_rejected">Rejected / Cancelled</button>
+              </div>
+              <div class="date-controls">
+                <select id="admin-verif-lab-filter" class="select input-compact" aria-label="Filter queue by lab"></select>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-admin-add-booking" data-i18n="btn_admin_book">+ Direct Booking / Block</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="verifikasi-table-wrap" class="table-wrap">
+            <table class="data-table data-table-cards">
+              <thead>
+                <tr>
+                  <th data-i18n="col_applicant">Applicant</th>
+                  <th data-i18n="col_lab_time">Lab &amp; Time</th>
+                  <th data-i18n="col_purpose_members">Purpose &amp; Team</th>
+                  <th data-i18n="col_status">Status</th>
+                  <th data-i18n="col_tech_action">Technician Action</th>
+                </tr>
+              </thead>
+              <tbody id="verifikasi-tbody"></tbody>
+            </table>
+          </div>
+          <div id="verifikasi-empty" class="state-box" hidden>
+            <h3 data-i18n="empty_verif_title">No matching booking requests</h3>
+            <p data-i18n="empty_verif_desc">Adjust status filters or search keywords to see other requests.</p>
+          </div>
+        </div>
+
+        <!-- Subpanel B: Master Data Ruang Lab -->
+        <div id="lpanel-labs" class="laboran-subpanel">
+          <div class="toolbar-card">
+            <div>
+              <strong data-i18n="master_labs_title">Laboratory Master Data</strong>
+              <span class="field-hint" style="display:block;" data-i18n="master_labs_hint">Toggle Maintenance directly if a room is unavailable for maintenance.</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-add-lab" data-i18n="btn_add_lab">+ Add Lab Room</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table data-table-cards">
+              <thead>
+                <tr>
+                  <th data-i18n="col_room_code">Code</th>
+                  <th data-i18n="col_room_name">Room Name</th>
+                  <th data-i18n="col_capacity">Capacity</th>
+                  <th data-i18n="col_specs">Specifications</th>
+                  <th data-i18n="col_status">Status</th>
+                  <th data-i18n="col_action">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="crud-labs-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Subpanel C: Jadwal Praktikum Rutin -->
+        <div id="lpanel-jadwal" class="laboran-subpanel">
+          <div class="toolbar-card command-bar">
+            <div class="command-top">
+              <div class="search-wrap">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <label for="admin-jadwal-search" class="sr-only">Search course or instructor</label>
+                <input type="text" id="admin-jadwal-search" class="input search-input" data-i18n-placeholder="ph_search_jadwal" placeholder="Search course, class, or instructor...">
+                <button type="button" class="search-clear" id="btn-clear-jadwal-search" aria-label="Clear search" hidden>✕</button>
+              </div>
+              <div class="date-controls">
+                <select id="admin-jadwal-lab-filter" class="select input-compact" aria-label="Filter by lab"></select>
+                <select id="admin-jadwal-day-filter" class="select input-compact" aria-label="Filter by day">
+                  <option value="all" data-i18n="all_days">All Days</option>
+                  <option value="1" data-i18n="day_1">Monday</option>
+                  <option value="2" data-i18n="day_2">Tuesday</option>
+                  <option value="3" data-i18n="day_3">Wednesday</option>
+                  <option value="4" data-i18n="day_4">Thursday</option>
+                  <option value="5" data-i18n="day_5">Friday</option>
+                  <option value="6" data-i18n="day_6">Saturday</option>
+                </select>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-add-jadwal" data-i18n="btn_add_jadwal">+ Add Schedule</button>
+              </div>
+            </div>
+          </div>
+          <div id="jadwal-table-wrap" class="table-wrap">
+            <table class="data-table data-table-cards">
+              <thead>
+                <tr>
+                  <th data-i18n="col_lab">Lab</th>
+                  <th data-i18n="col_day_time">Day &amp; Time</th>
+                  <th data-i18n="col_course_class">Course &amp; Class</th>
+                  <th data-i18n="col_instructor">Instructor</th>
+                  <th data-i18n="col_action">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="crud-jadwal-tbody"></tbody>
+            </table>
+          </div>
+          <div id="jadwal-empty" class="state-box" hidden>
+            <h3 data-i18n="empty_jadwal_title">No matching practicum schedule</h3>
+            <p data-i18n="empty_jadwal_desc">Adjust room, day, or search filters.</p>
+          </div>
+        </div>
+
+        <!-- Subpanel D: Rekap Pemanfaatan -->
+        <div id="lpanel-rekap" class="laboran-subpanel">
+          <div class="toolbar-card">
+            <div>
+              <strong data-i18n="rekap_title">Lab Utilization Summary</strong>
+              <span class="field-hint" style="display:block;" data-i18n="rekap_hint">Calculated directly from active booking records.</span>
+            </div>
+            <div class="date-controls">
+              <select id="rekap-period-filter" class="select input-compact" aria-label="Filter summary period">
+                <option value="all" data-i18n="period_all">All Periods</option>
+                <option value="week" data-i18n="period_week">This Week (7d)</option>
+                <option value="month" data-i18n="period_month">This Month</option>
+              </select>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv" data-i18n="btn_export_csv">Download CSV Report</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table data-table-cards">
+              <thead>
+                <tr>
+                  <th data-i18n="col_room_code">Lab Code</th>
+                  <th data-i18n="col_room_name">Lab Name</th>
+                  <th data-i18n="col_prac_week">Practicums/Week</th>
+                  <th data-i18n="col_approved">Approved</th>
+                  <th data-i18n="col_pending">Pending</th>
+                  <th data-i18n="col_rejected">Rejected / Cancelled</th>
+                </tr>
+              </thead>
+              <tbody id="rekap-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Subpanel E: Akun Pengguna (Full Admin Control) -->
+        <div id="lpanel-users" class="laboran-subpanel">
+          <div class="toolbar-card command-bar">
+            <div class="command-top">
+              <div class="search-wrap">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <label for="admin-user-search" class="sr-only">Search user accounts</label>
+                <input type="text" id="admin-user-search" class="input search-input" data-i18n-placeholder="ph_search_users" placeholder="Search name, NIM, email, or role...">
+                <button type="button" class="search-clear" id="btn-clear-user-search" aria-label="Clear search" hidden>✕</button>
+              </div>
+              <div class="date-controls">
+                <button type="button" class="btn btn-primary btn-sm" id="btn-add-user" data-i18n="btn_add_user">+ Add Account</button>
+              </div>
+            </div>
+          </div>
+          <div id="users-table-wrap" class="table-wrap">
+            <table class="data-table data-table-cards">
+              <thead>
+                <tr>
+                  <th data-i18n="col_user_name">Full Name</th>
+                  <th data-i18n="col_nim">Student ID / Code</th>
+                  <th data-i18n="col_ums_email">UMS Email</th>
+                  <th data-i18n="col_role">Role</th>
+                  <th data-i18n="col_bookings">Bookings</th>
+                  <th data-i18n="col_action">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="crud-users-tbody"></tbody>
+            </table>
+          </div>
+          <div id="users-empty" class="state-box" hidden>
+            <h3 data-i18n="empty_users_title">No matching accounts</h3>
+            <p data-i18n="empty_users_desc">Adjust search keywords or add a new account.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: SMART SLOT FINDER (STUDENT TOOLS) -->
+    <section id="view-finder" class="view-panel" aria-labelledby="workspace-title">
+      <div class="toolbar-card command-bar">
+        <div class="command-top finder-controls">
+          <div class="field">
+            <label for="finder-date" data-i18n="finder_lbl_date">Target Date</label>
+            <input type="date" id="finder-date" class="input">
+          </div>
+          <div class="field">
+            <label for="finder-duration" data-i18n="finder_lbl_dur">Needed Duration</label>
+            <select id="finder-duration" class="select">
+              <option value="1" data-i18n="finder_dur_1">1 Hour</option>
+              <option value="2" selected data-i18n="finder_dur_2">2 Hours</option>
+              <option value="3" data-i18n="finder_dur_3">3 Hours</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="finder-min-pc" data-i18n="finder_lbl_pcs">Min. PCs Needed</label>
+            <input type="number" id="finder-min-pc" class="input mono" min="1" max="40" value="4">
+          </div>
+          <div class="field">
+            <label for="finder-keyword" data-i18n="finder_lbl_tool">Software / Lab Filter</label>
+            <input type="text" id="finder-keyword" class="input" data-i18n-placeholder="finder_ph_tool" placeholder="e.g. Docker, Python, Figma, J.2.1">
+          </div>
+        </div>
+      </div>
+      <div id="finder-results-grid" class="finder-results-grid"></div>
+      <div id="finder-empty" class="state-box" hidden>
+        <h3 data-i18n="finder_empty_title">No consecutive free blocks found</h3>
+        <p data-i18n="finder_empty_desc">Try another date, shorter duration, or fewer required PCs.</p>
+      </div>
+    </section>
+
+    <!-- VIEW 6: LAB DIRECTORY & PRACTICUM TIMETABLE (STUDENT TOOLS) -->
+    <section id="view-labs" class="view-panel" aria-labelledby="workspace-title">
+      <div id="student-labs-grid" class="student-labs-grid"></div>
+      <div class="section-card" style="margin-top:16px;">
+        <div class="card-head-inline">
+          <div>
+            <h3 data-i18n="labs_prac_title">Weekly Routine Practicum Timetable</h3>
+            <p class="card-sub-inline" data-i18n="labs_prac_sub">Regular lecture schedules occupy these hours automatically; choose free slots outside these windows.</p>
+          </div>
+          <select id="student-prac-lab-filter" class="select input-compact" aria-label="Filter practicum by lab">
+            <option value="all" data-i18n="opt_all_labs">All Labs</option>
+          </select>
+        </div>
+        <div class="table-wrap" style="margin-top:12px;">
+          <table class="data-table data-table-cards">
+            <thead>
+              <tr>
+                <th data-i18n="col_day">Day</th>
+                <th data-i18n="col_time">Time</th>
+                <th data-i18n="col_lab">Lab Room</th>
+                <th data-i18n="col_course">Practicum Course</th>
+                <th data-i18n="col_instructor">Lecturer / Lab Asst</th>
+              </tr>
+            </thead>
+            <tbody id="student-prac-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 7: E-TICKET WALLET (STUDENT TOOLS) -->
+    <section id="view-tickets" class="view-panel" aria-labelledby="workspace-title">
+      <div id="tickets-wallet-grid" class="tickets-wallet-grid"></div>
+      <div id="tickets-empty" class="state-box" hidden>
+        <h3 data-i18n="tickets_empty_title">No approved E-Tickets yet</h3>
+        <p data-i18n="tickets_empty_desc">Once your booking is approved by a Lab Technician, your scannable QR pass appears here automatically for fast key pickup.</p>
+        <button type="button" class="btn btn-primary" id="btn-tickets-go-book" data-i18n="nav_book">Book a Lab</button>
+      </div>
+    </section>
+
+    <!-- VIEW 8: DEDICATED SIGN IN PAGE (/login) -->
+    <section id="view-login" class="view-panel auth-page-view" aria-labelledby="login-page-title">
+      <div class="auth-page-shell">
+        <div class="auth-page-topbar">
+          <a href="/labspace/" class="auth-back-link" data-nav="landing">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span data-i18n="auth_back_home">Back to Overview</span>
+          </a>
+          <div class="auth-route-switch" aria-label="Authentication pages">
+            <a href="/labspace/login" class="auth-route-pill is-active" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
+            <a href="/labspace/register" class="auth-route-pill" data-nav="register" data-i18n="btn_register">Register</a>
+          </div>
+        </div>
+
+        <div class="auth-page-card" id="login-page-card">
+          <div class="auth-split">
+            <aside class="auth-aside" aria-hidden="true">
+              <div>
+                <span class="auth-kicker" data-i18n="auth_aside_kicker">BUILDING J &middot; INFORMATICS</span>
+                <h3 class="auth-aside-title" data-i18n="auth_aside_title">One workspace pass for every computer lab.</h3>
+                <ul class="auth-aside-list">
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span data-i18n="auth_aside_pt1">Real-time 07:00-21:00 room slot check</span>
+                  </li>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span data-i18n="auth_aside_pt2">Automatic practicum clash protection</span>
+                  </li>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="13" y2="13"/></svg>
+                    <span data-i18n="auth_aside_pt3">Verified QR e-ticket for key pickup</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="auth-aside-foot">
+                <span class="mono">J.2.1 &ndash; J.2.4</span>
+                <span data-i18n="auth_aside_roles">Student &amp; Lab Staff Access</span>
+              </div>
+            </aside>
+
+            <div class="auth-main">
+              <div class="auth-page-head">
+                <span class="auth-page-badge" data-i18n="auth_login_badge">SIGN IN</span>
+                <h1 id="login-page-title" class="auth-main-title" data-i18n="modal_auth_login">Sign In to LabSpace TI</h1>
+                <p class="auth-main-sub" data-i18n="auth_main_sub">Use your UMS student email or NIM to book and track rooms.</p>
+              </div>
+
+              <form id="form-login">
+                <div class="form-grid">
+                  <div class="field is-full">
+                    <label for="login-identity" data-i18n="lbl_email_or_nim">UMS Email or Student ID</label>
+                    <div class="input-icon-wrap">
+                      <svg class="field-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      <input type="text" id="login-identity" class="input has-ico mono" autocomplete="username" data-i18n-placeholder="ph_login_id" placeholder="e.g., l200240081@student.ums.ac.id or L200240081" required>
+                    </div>
+                  </div>
+                  <div class="field is-full">
+                    <label for="login-password" data-i18n="lbl_password">Password</label>
+                    <div class="input-icon-wrap">
+                      <svg class="field-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      <input type="password" id="login-password" class="input has-ico has-pw" autocomplete="current-password" data-i18n-placeholder="ph_password" placeholder="Enter password" required>
+                      <button type="button" class="pw-toggle" data-toggle-pw="login-password" aria-label="Show password">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div id="login-error" class="alert-box alert-error" hidden style="margin-top:12px;"></div>
+                <div class="action-group" style="margin-top:16px;">
+                  <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="btn_sign_in">Sign In</button>
+                </div>
+                <div class="auth-quick-box">
+                  <p data-i18n="quick_fill_hint">Quick fill registered demo accounts (password: <span class="mono">labspace123</span>):</p>
+                  <div class="action-group">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-mhs" data-i18n="btn_quick_mhs">Fill Student Account</button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-lab" data-i18n="btn_quick_lab">Fill Lab Technician</button>
+                  </div>
+                </div>
+              </form>
+
+              <div class="auth-switch-row">
+                <span data-i18n="auth_no_account">Don't have a student account yet?</span>
+                <a href="/labspace/register" class="auth-switch-link" data-nav="register" data-i18n="auth_go_register">Register here &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 9: DEDICATED REGISTER PAGE (/register) -->
+    <section id="view-register" class="view-panel auth-page-view" aria-labelledby="register-page-title">
+      <div class="auth-page-shell">
+        <div class="auth-page-topbar">
+          <a href="/labspace/" class="auth-back-link" data-nav="landing">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span data-i18n="auth_back_home">Back to Overview</span>
+          </a>
+          <div class="auth-route-switch" aria-label="Authentication pages">
+            <a href="/labspace/login" class="auth-route-pill" data-nav="login" data-i18n="btn_sign_in">Sign In</a>
+            <a href="/labspace/register" class="auth-route-pill is-active" data-nav="register" data-i18n="btn_register">Register</a>
+          </div>
+        </div>
+
+        <div class="auth-page-card" id="register-page-card">
+          <div class="auth-split">
+            <aside class="auth-aside" aria-hidden="true">
+              <div>
+                <span class="auth-kicker" data-i18n="auth_reg_kicker">STUDENT REGISTRATION</span>
+                <h3 class="auth-aside-title" data-i18n="auth_reg_aside_title">Create your Building J student pass in seconds.</h3>
+                <ul class="auth-aside-list">
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    <span data-i18n="auth_reg_pt1">Register once using your official UMS NIM &amp; student email</span>
+                  </li>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span data-i18n="auth_reg_pt2">Submit group or solo lab reservations anytime</span>
+                  </li>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span data-i18n="auth_reg_pt3">Track technician approval &amp; download printable permits</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="auth-aside-foot">
+                <span class="mono">@student.ums.ac.id</span>
+                <span data-i18n="auth_reg_foot">FKI UMS Student Pass</span>
+              </div>
+            </aside>
+
+            <div class="auth-main">
+              <div class="auth-page-head">
+                <span class="auth-page-badge" data-i18n="tab_register">Student Register</span>
+                <h1 id="register-page-title" class="auth-main-title" data-i18n="modal_auth_register">Create Student Account</h1>
+                <p class="auth-main-sub" data-i18n="auth_main_sub_reg">Register your student NIM once to submit lab reservations.</p>
+              </div>
+
+              <form id="form-register">
+                <div class="form-grid">
+                  <div class="field is-full">
+                    <label for="reg-name" data-i18n="lbl_full_name">Full Name</label>
+                    <div class="input-icon-wrap">
+                      <svg class="field-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      <input type="text" id="reg-name" class="input has-ico" autocomplete="name" data-i18n-placeholder="ph_full_name" placeholder="Student full name" required>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="reg-nim" data-i18n="lbl_nim">Student ID (NIM)</label>
+                    <input type="text" id="reg-nim" class="input mono" placeholder="L200250001" required>
+                  </div>
+                  <div class="field">
+                    <label for="reg-prodi" data-i18n="profile_lbl_prodi">Study Program / Unit</label>
+                    <input type="text" id="reg-prodi" class="input" data-i18n-placeholder="profile_ph_prodi" placeholder="e.g., Informatics Engineering · 2024">
+                  </div>
+                  <div class="field is-full">
+                    <label for="reg-email" data-i18n="lbl_ums_email">UMS Email</label>
+                    <input type="email" id="reg-email" class="input mono" autocomplete="email" placeholder="nim@student.ums.ac.id" required>
+                  </div>
+                  <div class="field is-full">
+                    <label for="reg-password" data-i18n="lbl_password">Password</label>
+                    <div class="input-icon-wrap">
+                      <svg class="field-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      <input type="password" id="reg-password" class="input has-ico has-pw" autocomplete="new-password" data-i18n-placeholder="ph_reg_pass" placeholder="Minimum 6 characters" minlength="6" required>
+                      <button type="button" class="pw-toggle" data-toggle-pw="reg-password" aria-label="Show password">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div id="register-error" class="alert-box alert-error" hidden style="margin-top:12px;"></div>
+                <div class="action-group" style="margin-top:16px;">
+                  <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="btn_create_enter">Create Account &amp; Sign In</button>
+                </div>
+              </form>
+
+              <div class="auth-switch-row">
+                <span data-i18n="auth_has_account">Already have an account?</span>
+                <a href="/labspace/login" class="auth-switch-link" data-nav="login" data-i18n="auth_go_login">Sign in here &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <span class="footer-copy" data-i18n="footer_left">&copy; 2026 LabSpace TI &middot; Informatics Engineering, FKI UMS. All rights reserved.</span>
+      <div class="footer-meta">
+        <span data-i18n="footer_hours">Service Hours: Mon - Sat, 07:30 - 17:00 WIB</span>
+        <span aria-hidden="true">&middot;</span>
+        <button type="button" class="footer-reset-btn" id="btn-reset-demo" data-i18n="btn_reset_session">Reset session data</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile quick navigation">
+    <button type="button" class="mob-nav-btn is-active" data-nav="landing" id="mob-nav-landing">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span data-i18n="mob_home">Home</span>
+    </button>
+    <button type="button" class="mob-nav-btn" data-nav="monitoring" id="mob-nav-monitoring">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span data-i18n="mob_schedule">Schedule</span>
+    </button>
+    <button type="button" class="mob-nav-btn" data-nav="reservasi" id="mob-nav-reservasi">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span data-i18n="mob_book">Book</span>
+    </button>
+    <button type="button" class="mob-nav-btn" data-nav="riwayat" id="mob-nav-riwayat" hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span data-i18n="mob_tickets">Tickets</span>
+    </button>
+    <button type="button" class="mob-nav-btn" data-nav="laboran" id="mob-nav-laboran" hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span data-i18n="mob_admin">Admin</span>
+    </button>
+    <button type="button" class="mob-nav-btn" id="mob-nav-auth" data-nav="login">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      <span id="mob-nav-auth-label" data-i18n="btn_sign_in">Sign In</span>
+    </button>
+  </nav>
+
+  <!-- Mobile Drawer for Account, Language & Theme -->
+  <div id="mobile-drawer" class="mobile-drawer" aria-hidden="true" data-lenis-prevent>
+    <div class="drawer-scrim" id="drawer-scrim"></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h2 id="drawer-title" style="margin:0;font-size:1rem;" data-i18n="drawer_title">Account &amp; Preferences</h2>
+        <button type="button" class="icon-btn" id="btn-close-drawer" aria-label="Close menu">✕</button>
+      </div>
+      <div id="drawer-user-box">
+        <p class="field-hint" style="margin:0 0 8px;" data-i18n="drawer_status">Account Status</p>
+        <div class="panel-card" style="padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+            <span class="user-avatar drawer-avatar" id="drawer-avatar" aria-hidden="true"></span>
+            <div style="min-width:0;">
+              <strong id="drawer-user-name">Guest</strong>
+              <div class="mono" id="drawer-user-nim" style="color:var(--ink-muted);">Not signed in</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="mob-btn-edit-profile" hidden data-i18n="menu_edit_profile">Edit Profile</button>
+        </div>
+      </div>
+      <div id="drawer-nav-wrap" hidden>
+        <p class="field-hint" style="margin:0 0 8px;" data-i18n="drawer_workspace">Navigation</p>
+        <nav id="drawer-nav-list" class="drawer-nav-list" aria-label="Workspace navigation"></nav>
+      </div>
+      <div>
+        <p class="field-hint" style="margin:0 0 8px;" data-i18n="drawer_lang">Language / Bahasa</p>
+        <div class="lang-switcher lang-switcher-full" role="group" aria-label="Mobile language switcher">
+          <button type="button" class="lang-btn is-active" data-lang="en">English (EN)</button>
+          <button type="button" class="lang-btn" data-lang="id">Indonesia (ID)</button>
+        </div>
+      </div>
+      <div id="drawer-guest-actions" style="display:grid;gap:8px;">
+        <button type="button" class="btn btn-primary" id="mob-btn-login" data-i18n="btn_sign_in_account">Sign In to Account</button>
+        <button type="button" class="btn btn-secondary" id="mob-btn-register" data-i18n="btn_register_student">Register Student Account</button>
+      </div>
+      <button type="button" class="btn btn-secondary" id="mob-btn-logout" hidden data-i18n="btn_sign_out_account">Sign Out</button>
+      <button type="button" class="btn btn-secondary" id="mob-theme-toggle" data-i18n="btn_toggle_theme">Toggle Dark / Light Theme</button>
+      <button type="button" class="btn btn-danger" id="mob-reset-demo" data-i18n="btn_reset_session_cap">Reset Session Data</button>
+    </div>
+  </div>
+
+  <!-- Modal: Slot / Event Detail -->
+  <div id="modal-slot" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-slot-title">
+      <div class="modal-head">
+        <h2 id="modal-slot-title" data-i18n="modal_slot_title">Room Schedule Detail</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-slot" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="modal-body" id="modal-slot-body"></div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-slot" data-i18n="btn_close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Pending Reservation -->
+  <div id="modal-edit-res" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-edit-res-title">
+      <div class="modal-head">
+        <h2 id="modal-edit-res-title" data-i18n="modal_edit_res_title">Edit Booking Request</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-edit-res" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="form-edit-res">
+        <div class="modal-body">
+          <input type="hidden" id="edit-res-id">
+          <div class="form-grid">
+            <div class="field is-full">
+              <label for="edit-res-lab" data-i18n="lbl_lab_room">Laboratory Room</label>
+              <select id="edit-res-lab" class="select" required></select>
+            </div>
+            <div class="field">
+              <label for="edit-res-tanggal" data-i18n="lbl_date">Date</label>
+              <input type="date" id="edit-res-tanggal" class="input" required>
+            </div>
+            <div class="field">
+              <label for="edit-res-peserta" data-i18n="lbl_participants">Students</label>
+              <input type="number" id="edit-res-peserta" class="input" min="1" max="60" required>
+            </div>
+            <div class="field">
+              <label for="edit-res-mulai" data-i18n="lbl_start_time">Start Time</label>
+              <select id="edit-res-mulai" class="select" required></select>
+            </div>
+            <div class="field">
+              <label for="edit-res-selesai" data-i18n="lbl_end_time">End Time</label>
+              <select id="edit-res-selesai" class="select" required></select>
+            </div>
+            <div class="field is-full">
+              <label for="edit-res-keperluan" data-i18n="lbl_purpose">Purpose</label>
+              <input type="text" id="edit-res-keperluan" class="input" required>
+            </div>
+            <div class="field is-full">
+              <label for="edit-res-anggota" data-i18n="lbl_members">Team Members</label>
+              <textarea id="edit-res-anggota" class="textarea" required></textarea>
+            </div>
+          </div>
+          <div id="edit-res-error" class="alert-box alert-error" hidden style="margin-top:12px;"></div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-edit-res" data-i18n="btn_cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn_save_changes">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: E-Tiket / Surat Izin PDF -->
+  <div id="modal-permit" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog is-wide" role="dialog" aria-modal="true" aria-labelledby="modal-permit-title">
+      <div class="modal-head">
+        <h2 id="modal-permit-title" data-i18n="modal_permit_title">E-Ticket &amp; Lab Usage Permit</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-permit" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="modal-body" id="permit-print-area"></div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-permit" data-i18n="btn_close">Close</button>
+        <button type="button" class="btn btn-secondary" id="btn-copy-permit-code" data-i18n="btn_copy_ticket">Copy Ticket Code</button>
+        <button type="button" class="btn btn-primary" id="btn-print-permit" data-i18n="btn_print_pdf">Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Verifikasi Laboran -->
+  <div id="modal-verify" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-verify-title">
+      <div class="modal-head">
+        <h2 id="modal-verify-title" data-i18n="modal_verify_title">Verify Booking Request</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-verify" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="form-verify">
+        <div class="modal-body">
+          <input type="hidden" id="verify-res-id">
+          <input type="hidden" id="verify-action">
+          <p id="verify-summary" style="margin-top:0;"></p>
+          <div id="verify-error" class="alert-box alert-error" hidden style="margin-bottom:12px;"></div>
+          <div class="field" style="margin-bottom:10px;">
+            <label for="verify-preset-select" data-i18n="lbl_quick_reason">Quick Reason Template (Optional)</label>
+            <select id="verify-preset-select" class="select"></select>
+          </div>
+          <div class="field">
+            <label for="verify-note" data-i18n="lbl_tech_note">Lab Technician Note</label>
+            <textarea id="verify-note" class="textarea" data-i18n-placeholder="ph_tech_note" placeholder="e.g., Approved. Pick up key in technician room floor 2 with student ID card."></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-verify" data-i18n="btn_cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-verify-submit" data-i18n="btn_confirm">Confirm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: CRUD Ruang Lab -->
+  <div id="modal-lab-crud" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-lab-crud-title">
+      <div class="modal-head">
+        <h2 id="modal-lab-crud-title" data-i18n="modal_add_lab">Add Lab Room</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-lab-crud" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="form-lab-crud">
+        <div class="modal-body">
+          <input type="hidden" id="lab-crud-id">
+          <div class="form-grid">
+            <div class="field">
+              <label for="lab-crud-kode" data-i18n="col_room_code">Room Code</label>
+              <input type="text" id="lab-crud-kode" class="input" placeholder="J.2.5" required>
+            </div>
+            <div class="field">
+              <label for="lab-crud-kapasitas" data-i18n="lbl_capacity_pc">Capacity (PC)</label>
+              <input type="number" id="lab-crud-kapasitas" class="input" min="1" max="100" value="35" required>
+            </div>
+            <div class="field is-full">
+              <label for="lab-crud-nama" data-i18n="col_room_name">Lab Name</label>
+              <input type="text" id="lab-crud-nama" class="input" placeholder="Mobile Computing Lab" required>
+            </div>
+            <div class="field is-full">
+              <label for="lab-crud-spek" data-i18n="col_specs">Hardware &amp; Software Specs</label>
+              <input type="text" id="lab-crud-spek" class="input" placeholder="35 PC Core i7, 16GB RAM, Android Studio" required>
+            </div>
+            <div class="field is-full">
+              <label for="lab-crud-status" data-i18n="col_status">Status</label>
+              <select id="lab-crud-status" class="select">
+                <option value="aktif" data-i18n="opt_active">Active / Ready</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-lab-crud" data-i18n="btn_cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn_save_room">Save Room</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: CRUD Jadwal Rutin -->
+  <div id="modal-jadwal-crud" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-jadwal-crud-title">
+      <div class="modal-head">
+        <h2 id="modal-jadwal-crud-title" data-i18n="modal_add_jadwal">Add Routine Practicum Schedule</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-jadwal-crud" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="form-jadwal-crud">
+        <div class="modal-body">
+          <input type="hidden" id="jadwal-crud-id">
+          <div class="form-grid">
+            <div class="field">
+              <label for="jadwal-crud-lab" data-i18n="col_lab">Lab Room</label>
+              <select id="jadwal-crud-lab" class="select" required></select>
+            </div>
+            <div class="field">
+              <label for="jadwal-crud-hari" data-i18n="lbl_day">Day</label>
+              <select id="jadwal-crud-hari" class="select" required>
+                <option value="1" data-i18n="day_1">Monday</option>
+                <option value="2" data-i18n="day_2">Tuesday</option>
+                <option value="3" data-i18n="day_3">Wednesday</option>
+                <option value="4" data-i18n="day_4">Thursday</option>
+                <option value="5" data-i18n="day_5">Friday</option>
+                <option value="6" data-i18n="day_6">Saturday</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="jadwal-crud-mulai" data-i18n="lbl_start_time">Start Time</label>
+              <select id="jadwal-crud-mulai" class="select" required></select>
+            </div>
+            <div class="field">
+              <label for="jadwal-crud-selesai" data-i18n="lbl_end_time">End Time</label>
+              <select id="jadwal-crud-selesai" class="select" required></select>
+            </div>
+            <div class="field is-full">
+              <label for="jadwal-crud-matkul" data-i18n="lbl_course">Course</label>
+              <input type="text" id="jadwal-crud-matkul" class="input" placeholder="Database Practicum" required>
+            </div>
+            <div class="field">
+              <label for="jadwal-crud-kelas" data-i18n="lbl_class">Class</label>
+              <input type="text" id="jadwal-crud-kelas" class="input" placeholder="Class C" required>
+            </div>
+            <div class="field">
+              <label for="jadwal-crud-pengampu" data-i18n="col_instructor">Instructor</label>
+              <input type="text" id="jadwal-crud-pengampu" class="input" placeholder="Informatics Lab Team" required>
+            </div>
+          </div>
+          <div id="jadwal-crud-error" class="alert-box alert-error" hidden style="margin-top:12px;"></div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-jadwal-crud" data-i18n="btn_cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn_save_schedule">Save Schedule</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: CRUD Akun Pengguna -->
+  <div id="modal-user-crud" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-user-crud-title">
+      <div class="modal-head">
+        <h2 id="modal-user-crud-title" data-i18n="modal_add_user">Add User Account</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-user-crud" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="form-user-crud">
+        <div class="modal-body">
+          <input type="hidden" id="user-crud-id">
+          <div class="form-grid">
+            <div class="field is-full">
+              <label for="user-crud-name" data-i18n="lbl_full_name">Full Name</label>
+              <input type="text" id="user-crud-name" class="input" required>
+            </div>
+            <div class="field">
+              <label for="user-crud-nim" data-i18n="lbl_nim">Student ID (NIM)</label>
+              <input type="text" id="user-crud-nim" class="input" placeholder="L200250001" required>
+            </div>
+            <div class="field">
+              <label for="user-crud-role" data-i18n="col_role">Role</label>
+              <select id="user-crud-role" class="select" required>
+                <option value="mahasiswa" data-i18n="role_student">Student</option>
+                <option value="laboran" data-i18n="role_admin">Admin / Lab Staff</option>
+              </select>
+            </div>
+            <div class="field is-full">
+              <label for="user-crud-email" data-i18n="lbl_ums_email">UMS Email</label>
+              <input type="email" id="user-crud-email" class="input" placeholder="nim@student.ums.ac.id" required>
+            </div>
+            <div class="field is-full">
+              <label for="user-crud-password" data-i18n="lbl_password_opt">Password (leave blank when editing to keep current)</label>
+              <input type="password" id="user-crud-password" class="input" minlength="6" placeholder="Minimum 6 characters">
+            </div>
+          </div>
+          <div id="user-crud-error" class="alert-box alert-error" hidden style="margin-top:12px;"></div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-user-crud" data-i18n="btn_cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn_save_account">Save Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Admin Direct Booking / Slot Block -->
+  <div id="modal-admin-booking" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-admin-book-title">
+      <div class="modal-head">
+        <h2 id="modal-admin-book-title" data-i18n="modal_admin_book">Direct Booking / Admin Slot Block</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-admin-booking" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="form-admin-booking">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field is-full">
+              <label for="admin-book-lab" data-i18n="col_lab">Lab Room</label>
+              <select id="admin-book-lab" class="select" required></select>
+            </div>
+            <div class="field">
+              <label for="admin-book-tanggal" data-i18n="lbl_date">Date</label>
+              <input type="date" id="admin-book-tanggal" class="input" required>
+            </div>
+            <div class="field">
+              <label for="admin-book-peserta" data-i18n="lbl_participants">Participants</label>
+              <input type="number" id="admin-book-peserta" class="input" min="1" max="50" value="30" required>
+            </div>
+            <div class="field">
+              <label for="admin-book-mulai" data-i18n="lbl_start_time">Start Time</label>
+              <select id="admin-book-mulai" class="select" required></select>
+            </div>
+            <div class="field">
+              <label for="admin-book-selesai" data-i18n="lbl_end_time">End Time</label>
+              <select id="admin-book-selesai" class="select" required></select>
+            </div>
+            <div class="field is-full">
+              <label for="admin-book-pemohon" data-i18n="lbl_admin_holder">Booked For / PIC</label>
+              <input type="text" id="admin-book-pemohon" class="input" placeholder="e.g. Lab Exam / Guest Lecturer / Student Name" required>
+            </div>
+            <div class="field is-full">
+              <label for="admin-book-keperluan" data-i18n="lbl_purpose">Purpose</label>
+              <input type="text" id="admin-book-keperluan" class="input" placeholder="e.g. Remedial Practicum / Workshop TI" required>
+            </div>
+          </div>
+          <div id="admin-book-error" class="alert-box alert-error" hidden style="margin-top:12px;"></div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-admin-booking" data-i18n="btn_cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn_save_booking">Confirm &amp; Approve</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Konfirmasi Aksi -->
+  <div id="modal-confirm" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title">
+      <div class="modal-head">
+        <h2 id="modal-confirm-title" data-i18n="modal_confirm_title">Confirm Action</h2>
+        <button type="button" class="icon-btn" data-close-modal="modal-confirm" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-confirm-msg" style="margin:0;"></p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-confirm" data-i18n="btn_cancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-ok" data-i18n="btn_confirm_yes">Yes, Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Profile & Account Settings -->
+  <div id="modal-profile-edit" class="modal-backdrop" aria-hidden="true" data-lenis-prevent>
+    <div class="modal-dialog is-profile" role="dialog" aria-modal="true" aria-labelledby="modal-profile-title">
+      <div class="modal-head">
+        <div>
+          <h2 id="modal-profile-title" data-i18n="profile_modal_title">Account Settings</h2>
+          <p id="modal-profile-sub" class="modal-head-sub" data-i18n="profile_modal_sub">Manage your identity card, contact details, security, and preferences.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-modal="modal-profile-edit" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="form-profile-edit" novalidate>
+        <div class="modal-body">
+          <div class="profile-hero-card">
+            <div class="profile-hero-left">
+              <div class="user-avatar-lg" id="profile-preview-avatar" aria-hidden="true"><span class="user-online-dot"></span></div>
+              <div class="profile-hero-info">
+                <div class="profile-hero-name-row">
+                  <strong id="profile-preview-name">Nadia Larasati</strong>
+                  <span class="user-role-pill" id="profile-preview-role">Student</span>
+                </div>
+                <div class="profile-hero-meta">
+                  <span class="mono" id="profile-preview-nim">L200240147</span>
+                  <span aria-hidden="true">&middot;</span>
+                  <span id="profile-preview-prodi">Teknik Informatika</span>
+                </div>
+              </div>
+            </div>
+            <div class="profile-hero-stats">
+              <div class="profile-stat-chip">
+                <strong class="mono" id="profile-stat-1-val">0</strong>
+                <span id="profile-stat-1-lbl">Active</span>
+              </div>
+              <div class="profile-stat-chip">
+                <strong class="mono" id="profile-stat-2-val">0</strong>
+                <span id="profile-stat-2-lbl">Approved</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-tabs" role="tablist" aria-label="Profile sections">
+            <button type="button" class="profile-tab-btn is-active" role="tab" aria-selected="true" data-profile-tab="profile" data-i18n="profile_tab_general">Profile</button>
+            <button type="button" class="profile-tab-btn" role="tab" aria-selected="false" data-profile-tab="security" data-i18n="profile_tab_security">Security</button>
+            <button type="button" class="profile-tab-btn" role="tab" aria-selected="false" data-profile-tab="preferences" data-i18n="profile_tab_prefs">Preferences</button>
+          </div>
+
+          <div id="profile-edit-alert" class="alert-box alert-error" hidden></div>
+
+          <div class="profile-panel is-active" data-profile-panel="profile">
+            <div class="field" style="margin-bottom: 14px;">
+              <label data-i18n="profile_lbl_avatar">Character Avatar</label>
+              <div class="avatar-picker-grid" id="profile-avatar-picker" role="radiogroup" aria-label="Choose character avatar"></div>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="profile-edit-name" data-i18n="lbl_full_name">Full Name</label>
+                <input type="text" id="profile-edit-name" class="input" required minlength="2">
+              </div>
+              <div class="field">
+                <label for="profile-edit-nim" data-i18n="lbl_nim_staff">NIM / Staff ID</label>
+                <div class="input-icon-wrap">
+                  <svg class="field-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <input type="text" id="profile-edit-nim" class="input mono has-ico is-readonly" readonly>
+                </div>
+              </div>
+              <div class="field">
+                <label for="profile-edit-prodi" data-i18n="profile_lbl_prodi">Study Program / Unit</label>
+                <input type="text" id="profile-edit-prodi" class="input" data-i18n-placeholder="profile_ph_prodi" placeholder="e.g., Informatics Engineering · 2024">
+              </div>
+              <div class="field">
+                <label for="profile-edit-phone" data-i18n="profile_lbl_phone">WhatsApp / Contact</label>
+                <input type="tel" id="profile-edit-phone" class="input mono" data-i18n-placeholder="profile_ph_phone" placeholder="0812-3456-7890">
+              </div>
+              <div class="field is-full">
+                <label for="profile-edit-email" data-i18n="lbl_email_ums">UMS Email</label>
+                <input type="email" id="profile-edit-email" class="input mono" required>
+                <span class="field-hint" data-i18n="profile_hint_email">Use your official @student.ums.ac.id or @ums.ac.id address.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-panel" data-profile-panel="security" hidden>
+            <div class="profile-security-note" data-i18n="profile_security_note">Leave all password fields blank if you only want to update your profile info. Enter your current password to set a new one.</div>
+            <div class="form-grid">
+              <div class="field is-full">
+                <label for="profile-edit-current-password" data-i18n="profile_lbl_curr_pass">Current Password</label>
+                <div class="input-icon-wrap">
+                  <svg class="field-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <input type="password" id="profile-edit-current-password" class="input has-ico has-pw" autocomplete="current-password" data-i18n-placeholder="profile_ph_curr_pass" placeholder="Enter current password">
+                  <button type="button" class="pw-toggle" data-toggle-pw="profile-edit-current-password" aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="profile-edit-password" data-i18n="profile_lbl_new_pass">New Password</label>
+                <div class="input-icon-wrap">
+                  <svg class="field-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                  <input type="password" id="profile-edit-password" class="input has-ico has-pw" minlength="6" autocomplete="new-password" data-i18n-placeholder="ph_reg_pass" placeholder="Minimum 6 characters">
+                  <button type="button" class="pw-toggle" data-toggle-pw="profile-edit-password" aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="profile-edit-confirm-password" data-i18n="profile_lbl_confirm_pass">Confirm New Password</label>
+                <div class="input-icon-wrap">
+                  <svg class="field-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                  <input type="password" id="profile-edit-confirm-password" class="input has-ico has-pw" minlength="6" autocomplete="new-password" data-i18n-placeholder="profile_ph_confirm_pass" placeholder="Repeat new password">
+                  <button type="button" class="pw-toggle" data-toggle-pw="profile-edit-confirm-password" aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-panel" data-profile-panel="preferences" hidden>
+            <div class="profile-pref-list">
+              <div class="profile-pref-item">
+                <div>
+                  <strong data-i18n="profile_pref_lang_title">Interface Language</strong>
+                  <span data-i18n="profile_pref_lang_desc">Applies immediately to navigation, schedules, and permits.</span>
+                </div>
+                <div class="profile-seg-group" role="group" aria-label="Language preference">
+                  <button type="button" class="profile-seg-btn" data-profile-lang="en">EN</button>
+                  <button type="button" class="profile-seg-btn" data-profile-lang="id">ID</button>
+                </div>
+              </div>
+              <div class="profile-pref-item">
+                <div>
+                  <strong data-i18n="profile_pref_theme_title">Appearance Theme</strong>
+                  <span data-i18n="profile_pref_theme_desc">Choose between crisp daylight or dark workspace mode.</span>
+                </div>
+                <div class="profile-seg-group" role="group" aria-label="Theme preference">
+                  <button type="button" class="profile-seg-btn" data-profile-theme="light" data-i18n="profile_theme_light">Light</button>
+                  <button type="button" class="profile-seg-btn" data-profile-theme="dark" data-i18n="profile_theme_dark">Dark</button>
+                </div>
+              </div>
+              <div class="profile-pref-item">
+                <div>
+                  <strong data-i18n="profile_pref_id_title">Quick Copy Student / Staff ID</strong>
+                  <span data-i18n="profile_pref_id_desc">Copy your registered NIM or staff code for booking forms.</span>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-profile-copy-id" data-i18n="profile_btn_copy_id">Copy ID</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-profile-edit" data-i18n="btn_cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn_save_changes">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Floating Interactive Support Launcher & Widget -->
+  <div id="support-float-root" class="support-float-root">
+    <div id="support-widget" class="support-widget" role="dialog" aria-label="LabSpace Support Widget" hidden data-lenis-prevent>
+      <div class="support-widget-head">
+        <div class="support-widget-brand">
+          <span class="support-bot-avatar" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.2 6.8H21l-5.5 4 2.1 6.8L12 15.6l-5.6 4 2.1-6.8-5.5-4h6.8z"/></svg>
+            <span class="support-online-dot"></span>
+          </span>
+          <div class="support-widget-titles">
+            <div class="support-widget-title-row">
+              <strong id="support-widget-title" data-i18n="ai_head_title">LabSpace AI</strong>
+              <span class="support-ai-badge" id="support-widget-badge">AI</span>
+            </div>
+            <span class="support-widget-sub" id="support-widget-sub" data-i18n="cs_online_badge">Online · Building J FKI</span>
+          </div>
+        </div>
+        <div class="support-widget-head-actions">
+          <button type="button" class="support-head-icon-btn" id="btn-ai-clear" title="Clear chat" aria-label="Clear chat">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+          <button type="button" class="support-head-icon-btn" id="btn-close-support" aria-label="Close support widget">✕</button>
+        </div>
+      </div>
+
+      <div class="support-mode-bar support-widget-tabs" role="tablist" aria-label="Support channel">
+        <button type="button" class="support-mode-btn is-active" role="tab" aria-selected="true" data-support-mode="ai" id="btn-support-mode-ai">
+          <span data-i18n="support_tab_ai">Asisten AI</span>
+        </button>
+        <button type="button" class="support-mode-btn" role="tab" aria-selected="false" data-support-mode="cs" id="btn-support-mode-cs">
+          <span data-i18n="support_tab_cs">Chat CS / Lab Staff</span>
+          <span class="nav-count" id="support-cs-count">0</span>
+        </button>
+      </div>
+
+      <div id="support-panel-ai" class="support-panel is-active">
+        <div class="support-prompt-chips" id="ai-quick-prompts"></div>
+        <div id="ai-chat-stream" class="support-chat-stream support-widget-stream" data-lenis-prevent></div>
+        <form id="form-ai-chat" class="support-widget-composer">
+          <label for="ai-chat-input" class="sr-only">Tanya Asisten AI</label>
+          <input type="text" id="ai-chat-input" class="input" data-i18n-placeholder="ph_ai_input" placeholder="Tanya lab yang kosong hari ini, spek PC, atau E-Tiket..." autocomplete="off" required>
+          <button type="submit" class="btn btn-primary btn-sm" data-i18n="btn_send">Kirim</button>
+        </form>
+      </div>
+
+      <div id="support-panel-cs" class="support-panel">
+        <div id="cs-chat-stream" class="support-chat-stream support-widget-stream" data-lenis-prevent></div>
+        <form id="form-cs-chat" class="support-widget-cs-form">
+          <div class="support-cs-meta">
+            <select id="cs-topic-select" class="select input-compact" aria-label="Support topic">
+              <option value="schedule" data-i18n="cs_topic_schedule">Schedule &amp; Clash</option>
+              <option value="ticket" data-i18n="cs_topic_ticket">E-Ticket &amp; Key Pickup</option>
+              <option value="account" data-i18n="cs_topic_account">Account / NIM Issue</option>
+              <option value="facility" data-i18n="cs_topic_facility">Lab PC &amp; Software</option>
+            </select>
+            <span class="field-hint" id="cs-sender-hint"></span>
+          </div>
+          <div class="support-widget-composer">
+            <label for="cs-chat-input" class="sr-only">Message to lab support</label>
+            <input type="text" id="cs-chat-input" class="input" data-i18n-placeholder="ph_cs_input" placeholder="Describe your issue to Lab Technician CS..." autocomplete="off" required>
+            <button type="submit" class="btn btn-primary btn-sm" id="btn-cs-send" data-i18n="btn_send_cs">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <button type="button" class="support-fab" id="btn-support-fab" aria-expanded="false" aria-controls="support-widget">
+      <span class="support-fab-ico" aria-hidden="true">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </span>
+      <span class="support-fab-label" data-i18n="nav_support">Support</span>
+      <span class="support-fab-badge" id="support-fab-badge" hidden>0</span>
+    </button>
+  </div>
+
+  <div id="toast-stack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

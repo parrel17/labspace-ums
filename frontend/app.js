@@ -1492,16 +1492,19 @@
         );
       });
 
-      const faqCards = Array.from(document.querySelectorAll('.landing-faq-list .faq-item'));
+      const faqCards = Array.from(document.querySelectorAll('.landing-faq-list .faq-item')).filter((el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.top > window.innerHeight * 0.92;
+      });
       if (faqCards.length && window.ScrollTrigger) {
         window.gsap.fromTo(
           faqCards,
-          { y: 20, opacity: 0 },
+          { y: 18, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.46,
-            stagger: 0.075,
+            duration: 0.44,
+            stagger: 0.07,
             ease: 'power3.out',
             clearProps: 'transform,opacity,willChange',
             scrollTrigger: {
@@ -2198,8 +2201,10 @@
     document.querySelectorAll('.view-panel').forEach((p) => {
       const isTarget = p.id === `view-${viewName}`;
       if (isTarget) {
-        p.classList.remove('is-active');
-        void p.offsetWidth;
+        if (!options.isBoot) {
+          p.classList.remove('is-active');
+          void p.offsetWidth;
+        }
         p.classList.add('is-active');
       } else {
         p.classList.remove('is-active');
@@ -6158,7 +6163,7 @@
     } else if (user && user.role === 'laboran' && (initialView === 'reservasi' || initialView === 'riwayat' || initialView === 'finder' || initialView === 'tickets')) {
       initialView = 'laboran';
     }
-    switchView(initialView, null, { syncHistory: false });
+    switchView(initialView, null, { syncHistory: false, isBoot: true });
     if (!IS_FILE_PROTO && window.history && typeof window.history.replaceState === 'function') {
       const targetUrl = pathForView(state.activeView);
       if (window.location.pathname !== targetUrl) {
@@ -6167,6 +6172,9 @@
         } catch {}
       }
     }
+    window.requestAnimationFrame(() => {
+      document.documentElement.classList.remove('ls-booting');
+    });
 
     window.setInterval(() => {
       updateLiveClocks();

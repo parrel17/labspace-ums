@@ -137,6 +137,10 @@ html.theme-transitioning .landing-cta-card {
   transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease !important;
 }
 
+html.ls-booting body {
+  opacity: 0;
+}
+
 body {
   margin: 0;
   padding-top: 65px;
@@ -145,6 +149,7 @@ body {
   color: var(--ink);
   line-height: 1.5;
   min-height: 100dvh;
+  transition: opacity 140ms ease;
   display: flex;
   flex-direction: column;
   overflow-x: clip;
@@ -5514,15 +5519,15 @@ html[data-theme="dark"] .select {
 .faq-item:hover {
   border-color: var(--border-strong);
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(12, 12, 14, 0.08);
+  box-shadow: var(--shadow-md);
 }
 .faq-item[open] {
   border-color: var(--border-strong);
 }
 .faq-item.is-expanded {
   background: var(--surface-elevated);
-  border-color: rgba(37, 99, 235, 0.38);
-  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.08), var(--shadow-sm);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
 }
 .faq-item summary {
   list-style: none;
@@ -5553,8 +5558,8 @@ html[data-theme="dark"] .select {
 .faq-item.is-expanded .faq-chevron,
 .faq-item[open]:not(.is-closing) .faq-chevron {
   transform: rotate(180deg);
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.12);
+  color: var(--ink);
+  background: var(--surface-subtle);
 }
 .faq-answer-wrap {
   transition: opacity 0.24s ease, transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);

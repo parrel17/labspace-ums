@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'LabSpace TI UMS - Lab Availability & Reservation')</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logo-ls.png') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -26,13 +27,8 @@
         @endauth
 
         <a href="{{ route('home') }}" class="flex items-center gap-2.5 shrink-0 text-[var(--ink)] no-underline">
-          <span class="w-9 h-9 inline-flex items-center justify-center rounded-[10px] bg-[var(--accent)] text-[var(--surface)]">
-            <svg width="36" height="36" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-              <rect x="9" y="10" width="9" height="9" rx="2.5" fill="currentColor"/>
-              <rect x="22" y="10" width="9" height="9" rx="2.5" fill="currentColor"/>
-              <rect x="9" y="22" width="9" height="9" rx="2.5" fill="currentColor"/>
-              <circle cx="26.5" cy="26.5" r="4.5" fill="#16A34A"/>
-            </svg>
+          <span class="w-9 h-9 inline-flex items-center justify-center rounded-[10px] overflow-hidden">
+            <img src="{{ asset('images/logo-ls.png') }}" alt="" width="36" height="36" class="w-9 h-9 object-contain">
           </span>
           <span class="flex flex-col leading-tight">
             <strong class="text-base font-bold tracking-tight">LabSpace TI</strong>

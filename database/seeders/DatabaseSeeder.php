@@ -72,7 +72,7 @@ class DatabaseSeeder extends Seeder
                 'nama_lab' => 'Software Engineering Lab',
                 'nama_lab_id' => 'Lab Rekayasa Perangkat Lunak',
                 'kapasitas_pc' => 40,
-                'spesifikasi' => '40 PC Core i7, 16GB RAM, Dual Boot Windows & Ubuntu',
+                'spesifikasi' => 'Intel Core i7-13700, 32GB DDR5, 1TB NVMe, Dual-Boot Win 11 & Ubuntu 24.04',
                 'status' => 'aktif',
             ]
         );
@@ -83,7 +83,7 @@ class DatabaseSeeder extends Seeder
                 'nama_lab' => 'Networking & Security Lab',
                 'nama_lab_id' => 'Lab Jaringan & Keamanan Sistem',
                 'kapasitas_pc' => 36,
-                'spesifikasi' => '36 PC Core i5, Routerboard MikroTik, Switch Cisco',
+                'spesifikasi' => 'Intel Core i5-13500, 16GB DDR4, MikroTik RB4011, Cisco Catalyst 2960-X',
                 'status' => 'aktif',
             ]
         );
@@ -94,7 +94,7 @@ class DatabaseSeeder extends Seeder
                 'nama_lab' => 'Multimedia & Graphics Lab',
                 'nama_lab_id' => 'Lab Multimedia & Grafika',
                 'kapasitas_pc' => 32,
-                'spesifikasi' => '32 PC Core i7, GPU RTX 3060, Color Calibrated Display',
+                'spesifikasi' => 'Intel Core i7-13700K, RTX 3060 12GB, 32GB DDR5, ASUS ProArt 27" sRGB',
                 'status' => 'aktif',
             ]
         );
@@ -105,7 +105,7 @@ class DatabaseSeeder extends Seeder
                 'nama_lab' => 'Intelligent Systems & Data Lab',
                 'nama_lab_id' => 'Lab Sistem Cerdas & Data',
                 'kapasitas_pc' => 30,
-                'spesifikasi' => '30 Workstation Ryzen 7, 32GB RAM, Python & CUDA Ready',
+                'spesifikasi' => 'AMD Ryzen 7 7700, RTX 4060 8GB, 32GB DDR5, Ubuntu 24.04 + CUDA 12.6',
                 'status' => 'maintenance',
             ]
         );

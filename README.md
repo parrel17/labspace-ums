@@ -41,7 +41,7 @@ Satu alur siklus peminjaman ruang lab yang terstruktur dari pengecekan sampai pe
 
 | Tahap | Proses yang Terjadi | Aktor |
 |---|---|---|
-| **1. Cek Ketersediaan** | Mahasiswa membuka timeline harian per lab (`J.2.1`, `J.2.4`, `J.3.2`). Sistem memetakan slot **Praktikum Reguler**, **Reservasi Terisi**, dan **Slot Kosong** secara *real-time*. | Mahasiswa |
+| **1. Cek Ketersediaan** | Mahasiswa membuka timeline harian per lab (`J.2.1` – `J.2.4`). Sistem memetakan slot **Praktikum Reguler**, **Reservasi Terisi**, dan **Slot Kosong** secara *real-time*. | Mahasiswa |
 | **2. Ajukan Workspace** | Mahasiswa memilih slot kosong, mengisi tanggal, rentang jam (`jam_mulai`–`jam_selesai`), keperluan, dan daftar anggota kelompok (maks. 3 mahasiswa). | Mahasiswa |
 | **3. Validasi Anti-Bentrok** | Backend Laravel menjalankan *overlap query* terhadap `jadwal_rutin` dan `reservasis` yang sudah disetujui/menunggu pada `lab_id` dan tanggal yang sama. Jika bertabrakan, pengajuan langsung ditolak sebelum masuk database. | Sistem (Laravel) |
 | **4. Verifikasi Laboran** | Pengajuan yang lolos validasi masuk antrean berstatus `pending`. Laboran meninjau keperluan di dashboard, lalu memilih **Approve** atau **Reject** beserta catatan. | Laboran |
@@ -153,10 +153,14 @@ labspace-ums/
 │   ├── migrations/            # Skema tabel & relasi database
 │   └── seeders/               # Data awal ruangan lab & akun uji coba
 ├── frontend/                  # Interactive UI preview (Landing, Auth, Room Workspace, Permit PDF)
-│   ├── assets/                # Logo brand & foto ruang lab Gedung J
+│   ├── assets/                # Logo brand (logo-ls.png) & foto ruang lab Gedung J (j21–j24.webp)
 │   ├── index.html
 │   ├── styles.css
-│   └── app.js
+│   ├── app.js
+│   ├── qrcode.min.js
+│   ├── package.json
+│   ├── server.mjs             # Zero-dependency local SPA server (http://127.0.0.1:3000)
+│   └── README.md
 ├── public/
 ├── resources/
 │   ├── css/                   # Tailwind CSS entry
@@ -186,7 +190,9 @@ Setiap anggota kelompok bertanggung jawab penuh atas minimal **1 modul CRUD leng
 
 ## Quick Start
 
-**Prasyarat:** PHP `8.2+` (disarankan `8.3`), Composer, Node.js & npm, serta MySQL/MariaDB (via Laragon/XAMPP) atau SQLite.
+### 1. Menjalankan Backend Laravel (`http://127.0.0.1:8000`)
+
+**Prasyarat:** PHP `8.3+` (wajib sesuai `composer.json`), Composer, Node.js & npm, serta SQLite (default lokal) atau MySQL/MariaDB (via Laragon/XAMPP).
 
 ```bash
 # 1. Clone repository
@@ -201,16 +207,30 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
-# 4. Konfigurasi database di .env, lalu jalankan migrasi
-php artisan migrate
+# 4. Siapkan database (SQLite default di .env.example) lalu jalankan migrasi + seeder demo
+#    (Windows PowerShell: New-Item -ItemType File -Force database/database.sqlite)
+touch database/database.sqlite
+php artisan migrate --seed
 
-# 5. Jalankan development server
+# 5. Build asset Vite (atau jalankan `npm run dev` di terminal terpisah)
+npm run build
+
+# 6. Jalankan development server Laravel
 php artisan serve
-# Di terminal terpisah (jika compile asset Vite):
+```
+
+Aplikasi backend berjalan di `http://127.0.0.1:8000` (akun demo seeder: `l200240081@student.ums.ac.id` / `laboran@ums.ac.id`, password `labspace123`).
+
+### 2. Menjalankan Frontend Preview (`http://127.0.0.1:3000`)
+
+Folder `frontend/` berisi antarmuka interaktif lengkap (tanpa perlu `npm install` tambahan):
+
+```bash
+cd frontend
 npm run dev
 ```
 
-Aplikasi berjalan di `http://127.0.0.1:8000`.
+Atau buka `frontend/index.html` langsung via **Live Server** di VS Code / Antigravity. Panduan lengkap tersedia di [`frontend/README.md`](./frontend/README.md).
 
 ---
 

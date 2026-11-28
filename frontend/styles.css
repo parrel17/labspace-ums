@@ -213,13 +213,11 @@ select:disabled {
 }
 .word-inner {
   display: inline-block;
-  will-change: transform, opacity;
 }
 
 /* Top Header & Navigation */
 .app-header {
-  background: rgba(247, 244, 237, 0.97);
-  backdrop-filter: blur(8px);
+  background: rgba(247, 244, 237, 0.99);
   border-bottom: 1px solid var(--border);
   position: fixed;
   top: 0;

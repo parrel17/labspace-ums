@@ -1425,22 +1425,29 @@
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (lenisInstance) return;
     lenisInstance = new window.Lenis({
-      lerp: 0.14,
+      lerp: 0.1,
       smoothWheel: true,
       wheelMultiplier: 1,
       syncTouch: false,
-      prevent: (node) => Boolean(node && node.closest && node.closest('.modal-backdrop, .mobile-drawer, .notif-popover, .user-menu-popover'))
+      prevent: (node) => Boolean(node && node.closest && node.closest('.modal-backdrop, .mobile-drawer, .notif-popover, .user-menu-popover, .support-widget'))
     });
     if (window.ScrollTrigger) {
       lenisInstance.on('scroll', () => {
         if (state.activeView === 'landing') window.ScrollTrigger.update();
       });
     }
-    const raf = (time) => {
-      lenisInstance.raf(time);
+    if (window.gsap && window.gsap.ticker) {
+      window.gsap.ticker.add((time) => {
+        lenisInstance.raf(time * 1000);
+      });
+      window.gsap.ticker.lagSmoothing(0);
+    } else {
+      const raf = (time) => {
+        lenisInstance.raf(time);
+        requestAnimationFrame(raf);
+      };
       requestAnimationFrame(raf);
-    };
-    requestAnimationFrame(raf);
+    }
   }
 
   function setupLandingScrollAnimations() {
@@ -1553,8 +1560,11 @@
       const stepCapEl = document.getElementById('pinned-step-caption');
       const stepKeys = ['step1_title', 'step2_title', 'step3_title', 'step4_title'];
 
+      let lastStepIdx = -1;
       const activateStep = (idx) => {
         const clamped = Math.max(0, Math.min(stepCards.length - 1, idx));
+        if (clamped === lastStepIdx) return;
+        lastStepIdx = clamped;
         stepCards.forEach((c, i) => c.classList.toggle('is-active', i === clamped));
         if (progressBar) progressBar.style.width = `${((clamped + 1) / stepCards.length) * 100}%`;
         if (stepNumEl) stepNumEl.textContent = `0${clamped + 1} / 0${stepCards.length}`;

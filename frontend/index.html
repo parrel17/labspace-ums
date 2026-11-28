@@ -12,17 +12,17 @@
       }
     })();
   </script>
-  <link rel="icon" type="image/png" href="assets/logo-ls.png?v=57">
+  <link rel="icon" type="image/png" href="assets/logo-ls.png?v=58">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=57">
+  <link rel="stylesheet" href="styles.css?v=58">
   <script src="qrcode.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js" defer></script>
-  <script src="app.js?v=57" defer></script>
+  <script src="app.js?v=58" defer></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link" data-i18n="skip_content">Skip to main content</a>
@@ -1677,7 +1677,7 @@
                 <label for="profile-edit-nim" data-i18n="lbl_nim_staff">NIM / Staff ID</label>
                 <div class="input-icon-wrap">
                   <svg class="field-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <input type="text" id="profile-edit-nim" class="input mono has-ico is-readonly" readonly>
+                  <input type="text" id="profile-edit-nim" class="input mono has-ico is-readonly" readonly disabled aria-readonly="true" tabindex="-1">
                 </div>
               </div>
               <div class="field">

@@ -5131,10 +5131,20 @@ html[data-theme="dark"] .select {
   color: var(--ink);
   box-shadow: var(--shadow-sm);
 }
-.input.is-readonly {
+.input.is-readonly,
+.input:disabled {
   background-color: var(--surface-subtle);
   color: var(--ink-muted);
-  cursor: default;
+  cursor: not-allowed;
+  user-select: none;
+  caret-color: transparent;
+  opacity: 0.92;
+}
+.input.is-readonly:focus,
+.input:disabled:focus {
+  border-color: var(--border);
+  box-shadow: none;
+  outline: none;
 }
 .profile-security-note {
   padding: 10px 12px;

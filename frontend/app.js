@@ -2075,7 +2075,7 @@
     }
   }
 
-  function switchView(viewName, triggerEl = null, { syncHistory = true } = {}) {
+  function switchView(viewName, triggerEl = null, { syncHistory = true, isBoot = false } = {}) {
     const role = currentRole();
     if ((viewName === 'login' || viewName === 'register') && role !== 'guest') {
       viewName = role === 'laboran' ? 'laboran' : 'monitoring';
@@ -2232,7 +2232,7 @@
     document.querySelectorAll('.view-panel').forEach((p) => {
       const isTarget = p.id === `view-${viewName}`;
       if (isTarget) {
-        if (!options.isBoot) {
+        if (!isBoot) {
           p.classList.remove('is-active');
           void p.offsetWidth;
         }

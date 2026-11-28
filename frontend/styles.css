@@ -5509,14 +5509,20 @@ html[data-theme="dark"] .select {
   padding: 14px 16px;
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.24s ease;
 }
-.faq-item:hover,
+.faq-item:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(12, 12, 14, 0.08);
+}
 .faq-item[open] {
   border-color: var(--border-strong);
 }
 .faq-item.is-expanded {
   background: var(--surface-elevated);
+  border-color: rgba(37, 99, 235, 0.38);
+  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.08), var(--shadow-sm);
 }
 .faq-item summary {
   list-style: none;
@@ -5536,13 +5542,19 @@ html[data-theme="dark"] .select {
 .faq-chevron {
   flex-shrink: 0;
   color: var(--ink-muted);
+  width: 26px;
+  height: 26px;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--surface-subtle);
   transform: rotate(0deg);
-  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease;
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease, background-color 0.2s ease;
 }
 .faq-item.is-expanded .faq-chevron,
 .faq-item[open]:not(.is-closing) .faq-chevron {
   transform: rotate(180deg);
-  color: var(--ink);
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
 }
 .faq-answer-wrap {
   transition: opacity 0.24s ease, transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);

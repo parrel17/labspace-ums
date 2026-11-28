@@ -1492,6 +1492,27 @@
         );
       });
 
+      const faqCards = Array.from(document.querySelectorAll('.landing-faq-list .faq-item'));
+      if (faqCards.length && window.ScrollTrigger) {
+        window.gsap.fromTo(
+          faqCards,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.46,
+            stagger: 0.075,
+            ease: 'power3.out',
+            clearProps: 'transform,opacity,willChange',
+            scrollTrigger: {
+              trigger: '.landing-faq-list',
+              start: 'top 86%',
+              once: true
+            }
+          }
+        );
+      }
+
       const stepCards = Array.from(document.querySelectorAll('.workflow-step-card'));
       const progressBar = document.getElementById('pinned-progress-bar');
       const stepNumEl = document.getElementById('pinned-step-num');

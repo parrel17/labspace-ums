@@ -1470,7 +1470,7 @@
         );
       }
 
-      const heroSub = document.querySelectorAll('.hero-eyebrow, .hero-lead, .hero-actions, .hero-metric-item');
+      const heroSub = document.querySelectorAll('.hero-kicker-row, .hero-desc, .hero-cta-row, .hero-live-item');
       if (heroSub.length) {
         window.gsap.fromTo(
           heroSub,
@@ -2261,7 +2261,7 @@
 
     if (viewName === 'landing') {
       renderLanding();
-      if (!options.isBoot) setupLandingScrollAnimations();
+      setupLandingScrollAnimations();
     } else if (gsapCtx) {
       gsapCtx.revert();
       gsapCtx = null;
@@ -6203,10 +6203,8 @@
       }
     }
     document.documentElement.classList.remove('ls-booting');
-    if (state.activeView === 'landing') {
-      window.requestAnimationFrame(() => {
-        setupLandingScrollAnimations();
-      });
+    if (state.activeView === 'landing' && window.ScrollTrigger) {
+      window.ScrollTrigger.refresh();
     }
 
     window.setInterval(() => {
